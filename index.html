@@ -103,26 +103,19 @@
   nav.main-nav a.active{ color:var(--muted); }
 
   .left{
-    z-index:2; /* FIX 16: il menu e le sue liste restano sempre sopra le foto, anche se sconfinano oltre la colonna sinistra */
+    z-index:2; /* il menu e le sue liste restano sempre sopra le foto */
   }
 
-  .nav-row{
-    display:flex;
-    align-items:center;
-    flex-wrap:nowrap; /* mai a capo — così non aumenta mai l'altezza della riga e non sposta le voci sotto */
-    gap:0.6rem; /* FIX 19: avvicinata la lista alla voce di menu (era 1.1rem) */
-  }
-
+  /* FIX 21: la lista progetti è di nuovo verticale — è una colonna a
+     parte, sempre a fianco del menu, e non lo sposta mai */
   .project-list ul{
     list-style:none;
     display:flex;
-    flex-direction:row;
-    flex-wrap:nowrap; /* idem — resta su una sola riga */
-    white-space:nowrap;
-    gap:1rem;
+    flex-direction:column;
+    gap:0.6rem;
   }
   .project-list a{
-    font-size:0.95rem; /* FIX 15: stessa dimensione delle voci del menu (era 1.4rem) */
+    font-size:0.95rem; /* stessa dimensione delle voci del menu */
     text-transform:uppercase;
     letter-spacing:0.04em;
     transition:opacity .25s ease;
@@ -263,33 +256,32 @@
       <a class="brand" href="index.html" data-view="home">Brigida Brancale</a>
 
       <nav class="main-nav">
-        <div class="nav-row">
-          <a href="stories.html" data-view="stories">Stories</a>
-          <div class="project-list" id="list-stories" hidden>
-            <ul>
-              <li><a href="stories.html#siwa" data-project="siwa">SIWA</a></li>
-              <li><a href="stories.html#cellulari" data-project="cellulari">Cellulari</a></li>
-              <li><a href="stories.html#abitare" data-project="abitare">Abitare</a></li>
-              <li><a href="stories.html#here-be-dragons" data-project="here-be-dragons">Here Be Dragons</a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="nav-row">
-          <a href="work.html" data-view="works">Works</a>
-          <div class="project-list" id="list-works" hidden>
-            <ul>
-              <li><a href="work.html#canificio" data-project="canificio">Canificio</a></li>
-              <li><a href="work.html#memoria-collettiva" data-project="memoria-collettiva">Memoria Collettiva</a></li>
-              <li><a href="work.html#artiglieria" data-project="artiglieria">Artiglieria</a></li>
-              <li><a href="work.html#nanako" data-project="nanako">Nanako</a></li>
-              <li><a href="work.html#marcon" data-project="marcon">Marcon</a></li>
-              <li><a href="work.html#nanako2" data-project="nanako2">Nanako2</a></li>
-            </ul>
-          </div>
-        </div>
+        <a href="stories.html" data-view="stories">Stories</a>
+        <a href="work.html" data-view="works">Works</a>
         <a href="publications.html" data-view="pubblication">Pubblication</a>
         <a href="collage.html" data-view="collage">Collage</a>
       </nav>
+
+      <!-- FIX 21: seconda colonna, in verticale, a destra del menu —
+           il menu non si sposta mai qualunque lista sia aperta -->
+      <div class="project-list" id="list-stories" hidden>
+        <ul>
+          <li><a href="stories.html#siwa" data-project="siwa">SIWA</a></li>
+          <li><a href="stories.html#cellulari" data-project="cellulari">Cellulari</a></li>
+          <li><a href="stories.html#abitare" data-project="abitare">Abitare</a></li>
+          <li><a href="stories.html#here-be-dragons" data-project="here-be-dragons">Here Be Dragons</a></li>
+        </ul>
+      </div>
+      <div class="project-list" id="list-works" hidden>
+        <ul>
+          <li><a href="work.html#canificio" data-project="canificio">Canificio</a></li>
+          <li><a href="work.html#memoria-collettiva" data-project="memoria-collettiva">Memoria Collettiva</a></li>
+          <li><a href="work.html#artiglieria" data-project="artiglieria">Artiglieria</a></li>
+          <li><a href="work.html#nanako" data-project="nanako">Nanako</a></li>
+          <li><a href="work.html#marcon" data-project="marcon">Marcon</a></li>
+          <li><a href="work.html#nanako2" data-project="nanako2">Nanako2</a></li>
+        </ul>
+      </div>
     </div>
 
     <!-- FIX 20: testo di spiegazione del progetto aperto — compare solo
