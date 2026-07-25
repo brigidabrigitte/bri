@@ -21,6 +21,14 @@
   }
 
   *{ box-sizing:border-box; margin:0; padding:0; }
+
+  /* FIX 5: .photo-grid e .book impostano "display:grid/flex"
+     direttamente sulla classe, e questo — a parità di specificità —
+     sovrascrive il comportamento di default dell'attributo "hidden"
+     (che dovrebbe applicare display:none). Questa regola garantisce
+     che "hidden" vinca sempre, qualunque display imposti la classe. */
+  [hidden]{ display:none !important; }
+
   html,body{
     background:var(--bg);
     color:var(--ink);
