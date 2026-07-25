@@ -10,10 +10,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 
 <style>
-  /* ============================================================
-     VARIABILI COLORE — cambia questi 3 valori per cambiare la
-     palette di tutto il sito
-     ============================================================ */
   :root{
     --bg:#F7F6F2;
     --ink:#14120F;
@@ -22,11 +18,6 @@
 
   *{ box-sizing:border-box; margin:0; padding:0; }
 
-  /* FIX 5: .photo-grid e .book impostano "display:grid/flex"
-     direttamente sulla classe, e questo — a parità di specificità —
-     sovrascrive il comportamento di default dell'attributo "hidden"
-     (che dovrebbe applicare display:none). Questa regola garantisce
-     che "hidden" vinca sempre, qualunque display imposti la classe. */
   [hidden]{ display:none !important; }
 
   html,body{
@@ -34,13 +25,10 @@
     color:var(--ink);
     font-family:'Instrument Sans', sans-serif;
     height:100%;
-    overflow:hidden; /* la home è pensata per stare tutta in un unico schermo, senza scroll */
+    overflow:hidden;
   }
   a{ color:inherit; text-decoration:none; }
 
-  /* ============================================================
-     LAYOUT GENERALE
-     ============================================================ */
   .page{
     display:flex;
     height:100vh;
@@ -63,9 +51,6 @@
     inset:0;
   }
 
-  /* ------------------------------------------------------------
-     GRIGLIA FOTO — usata da Pubblication e Collage
-     ------------------------------------------------------------ */
   .photo-grid{
     position:absolute;
     inset:0;
@@ -83,9 +68,6 @@
     display:block;
   }
 
-  /* ------------------------------------------------------------
-     NOME — angolo in alto a sinistra
-     ------------------------------------------------------------ */
   .brand{
     font-size:0.95rem;
     font-weight:500;
@@ -136,7 +118,7 @@
     transition:opacity .25s ease;
   }
   .project-list a:hover{ opacity:0.55; }
-  .project-list a.active{ opacity:0.55; } /* FIX: evidenzia il progetto aperto nel libro */
+  .project-list a.active{ opacity:0.55; }
 
   .about-link{
     position:absolute;
@@ -151,30 +133,29 @@
     right:3vw; bottom:2.4rem;
     font-size:0.85rem;
     color:var(--muted);
-    z-index:10; /* FIX: era 5, ora sempre sopra qualunque cornice/libro */
+    z-index:10;
   }
   .email-link:hover{ color:var(--ink); }
 
-  /* ============================================================
-     CORNICI FOTOGRAFICHE
-     ============================================================ */
   .frame{
     position:absolute;
-    overflow:hidden;
-    box-shadow:0 12px 30px rgba(0,0,0,0.10);
+    overflow:visible; /* FIX 6: non tagliamo più le foto, quindi non serve più nascondere ciò che esce */
   }
   .frame img{
     position:absolute;
-    inset:0;
-    width:100%; height:100%;
-    object-fit:cover;
+    top:50%; left:50%;
+    transform:translate(-50%, -50%);
+    max-width:100%;
+    max-height:100%;
+    width:auto;
+    height:auto;
+    object-fit:contain; /* FIX 6: era "cover" (ritagliava per riempire) — ora la foto resta intera con la sua proporzione */
+    box-shadow:0 12px 30px rgba(0,0,0,0.10);
     opacity:0;
     transition:opacity 0.9s ease;
   }
   .frame img.active{ opacity:1; }
 
-  /* FIX 4: non più tre cornici sovrapposte e ruotate, ma un'unica
-     cornice centrata con uno slideshow lineare (in ordine, non casuale) */
   #frame-home{
     top:10%;
     left:50%;
@@ -184,10 +165,6 @@
     z-index:1;
   }
 
-  /* ============================================================
-     LIBRO DI FOTO — FIX: mancava completamente lo stile,
-     "book-viewer" era invisibile/non funzionante
-     ============================================================ */
   .book{
     position:absolute;
     inset:0;
@@ -198,11 +175,6 @@
     justify-content:center;
     gap:1.2rem;
   }
-  /* FIX 2: il libro ora mostra due foto affiancate (pagina sx/dx),
-     e uno "stage" con overflow nascosto dentro cui scorre una
-     striscia (.book-track) di coppie di pagine (.book-spread).
-     Cliccando sullo stage si passa alla coppia successiva con
-     un'animazione di scorrimento orizzontale. */
   .book-stage{
     position:relative;
     width:100%;
@@ -227,15 +199,19 @@
     flex:1 1 0;
     height:100%;
     overflow:hidden;
+    background:#fff; /* FIX 7: riempie di bianco lo spazio vuoto che resta sotto le foto orizzontali */
     box-shadow:0 12px 30px rgba(0,0,0,0.10);
+    display:flex;
+    justify-content:center;
   }
   .book-page img{
     width:100%;
     height:100%;
-    object-fit:cover;
+    object-fit:contain; /* FIX 7: era "cover" (ritagliava) — ora la foto resta intera con la sua proporzione */
+    object-position:top center; /* FIX 7: allinea sempre in alto, sia le verticali che le orizzontali */
     display:block;
   }
-  .book-page.empty{ visibility:hidden; } /* mantiene lo spazio quando le foto sono dispari */
+  .book-page.empty{ visibility:hidden; }
   .book-nav{
     display:flex;
     align-items:center;
@@ -264,9 +240,6 @@
   }
   .book-close:hover{ color:var(--muted); }
 
-  /* ============================================================
-     RESPONSIVE
-     ============================================================ */
   @media(max-width:900px){
     html,body{ overflow:auto; }
     .page{ flex-direction:column; height:auto; }
@@ -324,7 +297,6 @@
     <div class="photo-grid" id="grid-pubblication" hidden></div>
     <div class="photo-grid" id="grid-collage" hidden></div>
 
-    <!-- FIX: ora questo contenitore viene davvero riempito da buildBook() -->
     <div class="book" id="book-viewer" hidden></div>
   </div>
 
@@ -333,11 +305,6 @@
 </div>
 
 <script>
-  /* ============================================================
-     FOTO DELLA CORNICE HOME — FIX 4: prima erano tre liste per tre
-     cornici diverse, ora è un'unica lista per un'unica cornice che
-     scorre le foto in ordine, una dopo l'altra.
-     ============================================================ */
   const homeImages = [
     "IMAGES/HBD01.jpg",
     "IMAGES/HBD02.jpg",
@@ -365,9 +332,6 @@
     "IMAGES/SIWA08.jpg",
   ];
 
-  /* ============================================================
-     FOTO DELLE GRIGLIE — Pubblication e Collage
-     ============================================================ */
   const pubblicationImages = [
     "https://picsum.photos/id/1011/500/500",
     "https://picsum.photos/id/1025/500/500",
@@ -385,96 +349,35 @@
     "https://picsum.photos/id/1057/500/500"
   ];
 
-  /* ============================================================
-     FOTO DI OGNI PROGETTO (libro) — FIX: questo elenco mancava
-     del tutto, per questo il libro non poteva funzionare.
-     >>> QUI VANNO LE TUE FOTO, una lista per ogni progetto <<<
-     Le chiavi devono coincidere con i valori "data-project" nel
-     menu (SIWA -> "siwa", Here Be Dragons -> "here-be-dragons", ecc.)
-     ============================================================ */
   const projectImages = {
     "siwa": [
-      "IMAGES/SIWA01.jpg",
-      "IMAGES/SIWA02.jpg",
-      "IMAGES/SIWA03.jpg",
-      "IMAGES/SIWA04.jpg",
-      "IMAGES/SIWA05.jpg",
-      "IMAGES/SIWA06.jpg",
-      "IMAGES/SIWA07.jpg",
-      "IMAGES/SIWA08.jpg",
-      "IMAGES/SIWA09.jpg",
-      "IMAGES/SIWA10.jpg",
-      "IMAGES/SIWA11.jpg",
-      "IMAGES/SIWA12.jpg",
-      "IMAGES/SIWA13.jpg",
-      "IMAGES/SIWA14.jpg",
-      "IMAGES/SIWA15.jpg",
-      "IMAGES/SIWA16.jpg",
-      "IMAGES/SIWA17.jpg",
-      "IMAGES/SIWA18.jpg",
-      "IMAGES/SIWA19.jpg",
-      "IMAGES/SIWA20.jpg",
+      "IMAGES/SIWA01.jpg","IMAGES/SIWA02.jpg","IMAGES/SIWA03.jpg","IMAGES/SIWA04.jpg",
+      "IMAGES/SIWA05.jpg","IMAGES/SIWA06.jpg","IMAGES/SIWA07.jpg","IMAGES/SIWA08.jpg",
+      "IMAGES/SIWA09.jpg","IMAGES/SIWA10.jpg","IMAGES/SIWA11.jpg","IMAGES/SIWA12.jpg",
+      "IMAGES/SIWA13.jpg","IMAGES/SIWA14.jpg","IMAGES/SIWA15.jpg","IMAGES/SIWA16.jpg",
+      "IMAGES/SIWA17.jpg","IMAGES/SIWA18.jpg","IMAGES/SIWA19.jpg","IMAGES/SIWA20.jpg",
     ],
     "cellulari": [
-      "IMAGES/PHONES - 001.jpg",
-      "IMAGES/PHONES - 002.jpg",
-      "IMAGES/PHONES - 003.jpg",
-      "IMAGES/PHONES - 004.jpg",
-      "IMAGES/PHONES - 005.jpg",
-      "IMAGES/PHONES - 006.jpg",
-      "IMAGES/PHONES - 007.jpg",
-      "IMAGES/PHONES - 008.jpg",
-      "IMAGES/PHONES - 009.jpg",
-      "IMAGES/PHONES - 0010.jpg",
-      "IMAGES/PHONES - 0011.jpg",
-      "IMAGES/PHONES - 0012.jpg",
-      "IMAGES/PHONES - 0013.jpg",
-      "IMAGES/PHONES - 0014.jpg",
-      "IMAGES/PHONES - 0015.jpg",
-      "IMAGES/PHONES - 0016.jpg",
-      "IMAGES/PHONES - 0017.jpg",
-      "IMAGES/PHONES - 0018.jpg",
-      "IMAGES/PHONES - 0019.jpg",
-      "IMAGES/PHONES - 0020.jpg",
-      "IMAGES/PHONES - 0021.jpg",
-      "IMAGES/PHONES - 0022.jpg",
-      "IMAGES/PHONES - 0023.jpg",
-      "IMAGES/PHONES - 0024.jpg",
-      "IMAGES/PHONES - 0025.jpg",
-      "IMAGES/PHONES - 0026.jpg",
+      "IMAGES/PHONES - 001.jpg","IMAGES/PHONES - 002.jpg","IMAGES/PHONES - 003.jpg","IMAGES/PHONES - 004.jpg",
+      "IMAGES/PHONES - 005.jpg","IMAGES/PHONES - 006.jpg","IMAGES/PHONES - 007.jpg","IMAGES/PHONES - 008.jpg",
+      "IMAGES/PHONES - 009.jpg","IMAGES/PHONES - 0010.jpg","IMAGES/PHONES - 0011.jpg","IMAGES/PHONES - 0012.jpg",
+      "IMAGES/PHONES - 0013.jpg","IMAGES/PHONES - 0014.jpg","IMAGES/PHONES - 0015.jpg","IMAGES/PHONES - 0016.jpg",
+      "IMAGES/PHONES - 0017.jpg","IMAGES/PHONES - 0018.jpg","IMAGES/PHONES - 0019.jpg","IMAGES/PHONES - 0020.jpg",
+      "IMAGES/PHONES - 0021.jpg","IMAGES/PHONES - 0022.jpg","IMAGES/PHONES - 0023.jpg","IMAGES/PHONES - 0024.jpg",
+      "IMAGES/PHONES - 0025.jpg","IMAGES/PHONES - 0026.jpg",
     ],
     "abitare": [
       "https://picsum.photos/seed/abitare1/900/1200",
       "https://picsum.photos/seed/abitare2/900/1200"
     ],
     "here-be-dragons": [
-      "IMAGES/HBD01.jpg",
-      "IMAGES/HBD02.jpg",
-      "IMAGES/HBD03.jpg",
-      "IMAGES/HBD04.jpg",
-      "IMAGES/HBD05.jpg",
-      "IMAGES/HBD06.jpg",
-      "IMAGES/HBD07.jpg",
-      "IMAGES/HBD09.jpg",
-      "IMAGES/HBD10.jpg",
-      "IMAGES/HBD11.jpg",
-      "IMAGES/HBD12.jpg",
-      "IMAGES/HBD13.jpg",
-      "IMAGES/HBD14.jpg",
-      "IMAGES/HBD15.jpg",
-      "IMAGES/HBD16.jpg",
-      "IMAGES/HBD17.jpg",
-      "IMAGES/HBD18.jpg",
-      "IMAGES/HBD19.jpg",
-      "IMAGES/HBD20.jpg",
-      "IMAGES/HBD21.jpg",
-      "IMAGES/HBD22.jpg",
-      "IMAGES/HBD23.jpg",
-      "IMAGES/HBD24.jpg",
-      "IMAGES/HBD25.jpg",
-      "IMAGES/HBD26.jpg",
-      "IMAGES/HBD27.jpg",
-      "IMAGES/HBD28.jpg",
+      "IMAGES/HBD01.jpg","IMAGES/HBD02.jpg","IMAGES/HBD03.jpg","IMAGES/HBD04.jpg",
+      "IMAGES/HBD05.jpg","IMAGES/HBD06.jpg","IMAGES/HBD07.jpg","IMAGES/HBD09.jpg",
+      "IMAGES/HBD10.jpg","IMAGES/HBD11.jpg","IMAGES/HBD12.jpg","IMAGES/HBD13.jpg",
+      "IMAGES/HBD14.jpg","IMAGES/HBD15.jpg","IMAGES/HBD16.jpg","IMAGES/HBD17.jpg",
+      "IMAGES/HBD18.jpg","IMAGES/HBD19.jpg","IMAGES/HBD20.jpg","IMAGES/HBD21.jpg",
+      "IMAGES/HBD22.jpg","IMAGES/HBD23.jpg","IMAGES/HBD24.jpg","IMAGES/HBD25.jpg",
+      "IMAGES/HBD26.jpg","IMAGES/HBD27.jpg","IMAGES/HBD28.jpg",
     ],
     "canificio": [
       "https://picsum.photos/seed/canificio1/900/1200",
@@ -513,11 +416,6 @@
   fillGrid('grid-pubblication', pubblicationImages);
   fillGrid('grid-collage', collageImages);
 
-  /* ============================================================
-     SLIDESHOW LINEARE — un'unica cornice, immagini in ordine
-     (FIX 4: prima erano 3 cornici con cambio a caso, ora una sola
-     cornice che scorre dritta, una foto dopo l'altra, in loop)
-     ============================================================ */
   function slideshow(containerId, images, intervalMs = 2600){
     const container = document.getElementById(containerId);
 
@@ -543,9 +441,6 @@
   slideshow('frame-home', homeImages);
 
 
-  /* ============================================================
-     CAMBIO VISTA — Home / Stories / Works / Pubblication / Collage
-     ============================================================ */
   const rightColumn      = document.getElementById('right');
   const framesWrap       = document.getElementById('frames-wrap');
   const gridPubblication = document.getElementById('grid-pubblication');
@@ -553,11 +448,11 @@
   const listStories      = document.getElementById('list-stories');
   const listWorks        = document.getElementById('list-works');
   const bookViewer       = document.getElementById('book-viewer');
-  const mainNav          = document.querySelector('nav.main-nav'); /* FIX 3: menu Stories/Works/Pubblication/Collage */
+  const mainNav          = document.querySelector('nav.main-nav');
   const navLinks         = document.querySelectorAll('[data-view]');
   const projectLinks     = document.querySelectorAll('[data-project]');
 
-  let currentView = 'home'; // FIX: serve per sapere dove tornare quando si chiude il libro
+  let currentView = 'home';
 
   function showView(view){
     currentView = view;
@@ -571,11 +466,9 @@
     gridPubblication.hidden   = (view !== 'pubblication');
     gridCollage.hidden        = (view !== 'collage');
 
-    // FIX 3: fuori dalla home il menu sparisce del tutto — resta
-    // visibile solo il nome "Brigida Brancale", che riporta alla home
     mainNav.style.display = (view === 'home') ? 'flex' : 'none';
 
-    bookViewer.hidden = true; // FIX: il libro si chiude ogni volta che si cambia vista dal menu
+    bookViewer.hidden = true;
     projectLinks.forEach(a => a.classList.remove('active'));
 
     navLinks.forEach(a => a.classList.toggle('active', a.dataset.view === view));
@@ -588,12 +481,6 @@
     });
   });
 
-  /* ============================================================
-     LIBRO DI FOTO — FIX: prima non esisteva alcun listener sui
-     link dei singoli progetti (data-project), quindi cliccando
-     su "SIWA", "Canificio" ecc. il browser tentava di aprire
-     stories.html / work.html invece di mostrare le foto.
-     ============================================================ */
   let bookImages = [];
   let spreadIndex = 0;
 
@@ -610,8 +497,6 @@
       return;
     }
 
-    // raggruppa le foto a coppie: [0,1], [2,3], [4,5]... (l'ultima
-    // coppia può avere una sola foto se il totale è dispari)
     const spreads = [];
     for(let i = 0; i < bookImages.length; i += 2){
       spreads.push([bookImages[i], bookImages[i + 1] || null]);
@@ -626,9 +511,6 @@
       closeBook();
     });
 
-    // lo "stage" mostra sempre una coppia di pagine; la "track" al
-    // suo interno contiene tutte le coppie una via l'altra e scorre
-    // orizzontalmente (transform: translateX) quando si cambia pagina
     const stage = document.createElement('div');
     stage.className = 'book-stage';
 
@@ -680,9 +562,6 @@
       render();
     }
 
-    // FIX 2: cliccando sul libro si sfoglia la pagina successiva
-    // con l'animazione di scorrimento; le frecce restano come
-    // alternativa (stopPropagation per non far scattare anche il click sullo stage)
     stage.addEventListener('click', goNext);
     prevBtn.addEventListener('click', e => { e.stopPropagation(); goPrev(); });
     nextBtn.addEventListener('click', e => { e.stopPropagation(); goNext(); });
@@ -696,21 +575,18 @@
     bookViewer.appendChild(nav);
     render();
 
-    // mostra il libro al posto di cornici/griglie sulla destra
     rightColumn.style.display = 'block';
     framesWrap.style.display = 'none';
     gridPubblication.hidden = true;
     gridCollage.hidden = true;
     bookViewer.hidden = false;
 
-    // evidenzia il progetto aperto nella lista a sinistra
     projectLinks.forEach(a => a.classList.toggle('active', a === linkEl));
   }
 
   function closeBook(){
     bookViewer.hidden = true;
     projectLinks.forEach(a => a.classList.remove('active'));
-    // torna alla vista che era aperta prima (stories o works)
     const hideRight = (currentView === 'stories' || currentView === 'works');
     rightColumn.style.display = hideRight ? 'none' : 'block';
     framesWrap.style.display = (currentView === 'home') ? 'block' : 'none';
@@ -725,9 +601,6 @@
     });
   });
 
-  // FIX: mancava lo stato iniziale — senza questa chiamata la voce
-  // "Brigida Brancale" non risultava evidenziata come vista attiva
-  // al caricamento della pagina.
   showView('home');
 </script>
 
