@@ -137,33 +137,26 @@
   }
   .email-link:hover{ color:var(--ink); }
 
-  .frame{
+  /* FIX 13: niente più cornice singola con crossfade — ora le foto
+     compaiono una alla volta in posizioni casuali (alternando metà
+     sinistra e metà destra dell'area), restano visibili e si
+     accumulano, poi a un certo punto spariscono tutte insieme e si
+     ricomincia. Vedi funzione startHomeCollage() più sotto. */
+  .home-collage{
     position:absolute;
-    overflow:visible; /* FIX 6: non tagliamo più le foto, quindi non serve più nascondere ciò che esce */
+    inset:0;
   }
-  .frame img{
+  .collage-photo{
     position:absolute;
-    top:50%; left:50%;
-    transform:translate(-50%, -50%);
-    max-width:100%;
-    max-height:100%;
+    max-width:26%;
+    max-height:36%;
     width:auto;
     height:auto;
-    object-fit:contain; /* FIX 6: era "cover" (ritagliava per riempire) — ora la foto resta intera con la sua proporzione */
     box-shadow:0 12px 30px rgba(0,0,0,0.10);
     opacity:0;
-    transition:opacity 0.9s ease;
+    transition:opacity 0.8s ease, transform 0.8s ease;
   }
-  .frame img.active{ opacity:1; }
-
-  #frame-home{
-    top:10%;
-    left:50%;
-    width:56%;
-    height:80%;
-    transform:translateX(-50%);
-    z-index:1;
-  }
+  .collage-photo.visible{ opacity:1; }
 
   .book{
     position:absolute;
@@ -188,38 +181,23 @@
     height:100%;
     transition:transform 0.6s cubic-bezier(.65,0,.35,1);
   }
-  .book-spread{
+  /* FIX 11: niente più coppie di pagine — una sola foto per slide,
+     con un semplice scorrimento orizzontale al click */
+  .book-slide{
     flex:0 0 100%;
     display:flex;
-    align-items:flex-start; /* FIX 10: pagine allineate in alto, anche quando hanno altezze diverse */
-    gap:0; /* niente più spazio tra le due pagine, si toccano come in un libro rilegato */
+    align-items:center;
+    justify-content:center;
     height:100%;
-    justify-content:center;
   }
-  .book-page{
-    height:100%; /* limite massimo di altezza — la foto può essere più bassa, la pagina no */
-    max-width:50%; /* limite massimo di larghezza — la pagina non supera mai metà dello stage */
-    display:flex;
-    align-items:flex-start;
-    justify-content:center;
-    overflow:hidden; /* rete di sicurezza, non dovrebbe mai tagliare data la regola sotto */
-  }
-  /* FIX 10: piccola ombra sul bordo dove le due pagine si toccano,
-     per simulare la piega/rilegatura al centro del libro */
-  .book-page:first-child img{
-    box-shadow:0 12px 30px rgba(0,0,0,0.10), inset -10px 0 14px -12px rgba(0,0,0,0.35);
-  }
-  .book-page:last-child img{
-    box-shadow:0 12px 30px rgba(0,0,0,0.10), inset 10px 0 14px -12px rgba(0,0,0,0.35);
-  }
-  .book-page img{
+  .book-slide img{
     display:block;
     max-width:100%;
     max-height:100%;
     width:auto;
-    height:auto; /* FIX 10: la foto mantiene le sue proporzioni naturali — niente crop, niente riempimento forzato */
+    height:auto; /* dimensioni naturali, niente crop */
+    box-shadow:0 12px 30px rgba(0,0,0,0.10);
   }
-  .book-page.empty{ visibility:hidden; }
   .book-nav{
     display:flex;
     align-items:center;
@@ -299,7 +277,7 @@
 
   <div class="right" id="right">
     <div class="frames-wrap" id="frames-wrap">
-      <div class="frame" id="frame-home"></div>
+      <div class="home-collage" id="home-collage"></div>
     </div>
 
     <div class="photo-grid" id="grid-pubblication" hidden></div>
@@ -424,29 +402,92 @@
   fillGrid('grid-pubblication', pubblicationImages);
   fillGrid('grid-collage', collageImages);
 
-  function slideshow(containerId, images, intervalMs = 2600){
-    const container = document.getElementById(containerId);
-
-    images.forEach((src, i) => {
-      const img = document.createElement('img');
-      img.src = src;
-      if(i === 0) img.classList.add('active');
-      container.appendChild(img);
-    });
-
-    const imgEls = container.querySelectorAll('img');
-    let current = 0;
-
-    if(imgEls.length < 2) return;
-
-    setInterval(() => {
-      imgEls[current].classList.remove('active');
-      current = (current + 1) % imgEls.length;
-      imgEls[current].classList.add('active');
-    }, intervalMs);
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
   }
 
-  slideshow('frame-home', homeImages);
+  /* ============================================================
+     COLLAGE CASUALE — home
+     Le foto compaiono una alla volta, a intervalli casuali, in
+     posizioni casuali (alternando la metà sinistra e la metà destra
+     dell'area), e restano visibili accumulandosi. Quando se ne sono
+     accumulate "maxVisible", dopo una breve pausa spariscono tutte
+     insieme e il ciclo ricomincia da capo con un nuovo ordine casuale.
+     >>> Per cambiare quante foto si accumulano prima di svuotare,
+     modifica il numero "maxVisible" qui sotto. <<<
+     ============================================================ */
+  function startHomeCollage(containerId, images, maxVisible = 8){
+    const container = document.getElementById(containerId);
+    if(images.length === 0) return;
+
+    let deck = shuffle(images);
+    let deckIndex = 0;
+    let shown = [];
+    let side = 0; // alterna 0 = metà sinistra, 1 = metà destra
+
+    function nextImage(){
+      if(deckIndex >= deck.length){
+        deck = shuffle(images);
+        deckIndex = 0;
+      }
+      return deck[deckIndex++];
+    }
+
+    function placeOne(){
+      const src = nextImage();
+      const img = document.createElement('img');
+      img.className = 'collage-photo';
+
+      const half = side % 2 === 0 ? 'left' : 'right';
+      side++;
+      const xMin = half === 'left' ? 6 : 54;
+      const xMax = half === 'left' ? 46 : 94;
+      const x = xMin + Math.random() * (xMax - xMin);
+      const y = 10 + Math.random() * 66;
+      const rot = (Math.random() * 8 - 4).toFixed(1);
+
+      img.style.left = x + '%';
+      img.style.top = y + '%';
+      img.style.transform = `translate(-50%, -50%) rotate(${rot}deg)`;
+      img.src = src;
+
+      container.appendChild(img);
+      shown.push(img);
+
+      // piccolo ritardo prima di aggiungere la classe "visible", così
+      // la transizione CSS del fade-in parte davvero
+      requestAnimationFrame(() => requestAnimationFrame(() => img.classList.add('visible')));
+
+      if(shown.length >= maxVisible){
+        setTimeout(resetCollage, 2200);
+        return;
+      }
+      scheduleNext();
+    }
+
+    function resetCollage(){
+      shown.forEach(img => img.classList.remove('visible'));
+      setTimeout(() => {
+        shown.forEach(img => img.remove());
+        shown = [];
+        scheduleNext();
+      }, 800);
+    }
+
+    function scheduleNext(){
+      const delay = 900 + Math.random() * 1400;
+      setTimeout(placeOne, delay);
+    }
+
+    scheduleNext();
+  }
+
+  startHomeCollage('home-collage', homeImages);
 
 
   const rightColumn      = document.getElementById('right');
@@ -468,13 +509,14 @@
     listStories.hidden = (view !== 'stories');
     listWorks.hidden   = (view !== 'works');
 
-    const hideRight = (view === 'stories' || view === 'works');
-    rightColumn.style.display = hideRight ? 'none' : 'block';
-    framesWrap.style.display  = (view === 'home') ? 'block' : 'none';
+    // FIX 12: la colonna destra e il menu non spariscono più — restano
+    // sempre visibili, anche quando apri Stories o Works
+    rightColumn.style.display = 'block';
+    framesWrap.style.display  = (view === 'pubblication' || view === 'collage') ? 'none' : 'block';
     gridPubblication.hidden   = (view !== 'pubblication');
     gridCollage.hidden        = (view !== 'collage');
 
-    mainNav.style.display = (view === 'home') ? 'flex' : 'none';
+    mainNav.style.display = 'flex';
 
     bookViewer.hidden = true;
     projectLinks.forEach(a => a.classList.remove('active'));
@@ -490,11 +532,11 @@
   });
 
   let bookImages = [];
-  let spreadIndex = 0;
+  let slideIndex = 0;
 
   function buildBook(key, linkEl){
     bookImages = projectImages[key] || [];
-    spreadIndex = 0;
+    slideIndex = 0;
     bookViewer.innerHTML = '';
 
     if(bookImages.length === 0){
@@ -503,11 +545,6 @@
       bookViewer.appendChild(empty);
       bookViewer.hidden = false;
       return;
-    }
-
-    const spreads = [];
-    for(let i = 0; i < bookImages.length; i += 2){
-      spreads.push([bookImages[i], bookImages[i + 1] || null]);
     }
 
     const closeBtn = document.createElement('a');
@@ -525,20 +562,14 @@
     const track = document.createElement('div');
     track.className = 'book-track';
 
-    spreads.forEach(pair => {
-      const spread = document.createElement('div');
-      spread.className = 'book-spread';
-      pair.forEach(src => {
-        const page = document.createElement('div');
-        page.className = 'book-page' + (src ? '' : ' empty');
-        if(src){
-          const img = document.createElement('img');
-          img.src = src;
-          page.appendChild(img);
-        }
-        spread.appendChild(page);
-      });
-      track.appendChild(spread);
+    // FIX 11: una slide per ogni foto, non più a coppie
+    bookImages.forEach(src => {
+      const slide = document.createElement('div');
+      slide.className = 'book-slide';
+      const img = document.createElement('img');
+      img.src = src;
+      slide.appendChild(img);
+      track.appendChild(slide);
     });
 
     stage.appendChild(track);
@@ -557,16 +588,16 @@
     nextBtn.textContent = '→';
 
     function render(){
-      track.style.transform = `translateX(-${spreadIndex * 100}%)`;
-      counter.textContent = (spreadIndex + 1) + ' / ' + spreads.length;
+      track.style.transform = `translateX(-${slideIndex * 100}%)`;
+      counter.textContent = (slideIndex + 1) + ' / ' + bookImages.length;
     }
 
     function goNext(){
-      spreadIndex = (spreadIndex + 1) % spreads.length;
+      slideIndex = (slideIndex + 1) % bookImages.length;
       render();
     }
     function goPrev(){
-      spreadIndex = (spreadIndex - 1 + spreads.length) % spreads.length;
+      slideIndex = (slideIndex - 1 + bookImages.length) % bookImages.length;
       render();
     }
 
@@ -577,6 +608,7 @@
     nav.appendChild(prevBtn);
     nav.appendChild(counter);
     nav.appendChild(nextBtn);
+
 
     bookViewer.appendChild(closeBtn);
     bookViewer.appendChild(stage);
@@ -595,9 +627,10 @@
   function closeBook(){
     bookViewer.hidden = true;
     projectLinks.forEach(a => a.classList.remove('active'));
-    const hideRight = (currentView === 'stories' || currentView === 'works');
-    rightColumn.style.display = hideRight ? 'none' : 'block';
-    framesWrap.style.display = (currentView === 'home') ? 'block' : 'none';
+    // FIX 12: la colonna destra resta sempre visibile, tornano le foto della
+    // home tranne quando si sta guardando Pubblication o Collage
+    rightColumn.style.display = 'block';
+    framesWrap.style.display = (currentView === 'pubblication' || currentView === 'collage') ? 'none' : 'block';
     gridPubblication.hidden = (currentView !== 'pubblication');
     gridCollage.hidden = (currentView !== 'collage');
   }
