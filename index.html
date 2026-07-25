@@ -152,7 +152,6 @@
     max-height:36%;
     width:auto;
     height:auto;
-    box-shadow:0 12px 30px rgba(0,0,0,0.10);
     opacity:0;
     transition:opacity 0.8s ease, transform 0.8s ease;
   }
@@ -449,11 +448,9 @@
       const xMax = half === 'left' ? 46 : 94;
       const x = xMin + Math.random() * (xMax - xMin);
       const y = 10 + Math.random() * 66;
-      const rot = (Math.random() * 8 - 4).toFixed(1);
 
       img.style.left = x + '%';
       img.style.top = y + '%';
-      img.style.transform = `translate(-50%, -50%) rotate(${rot}deg)`;
       img.src = src;
 
       container.appendChild(img);
