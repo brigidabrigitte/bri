@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>brigida brancale</title>
+<title>Brigida Brancale</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,7 +11,7 @@
 
 <style>
   :root{
-    --bg:#FFFFFF;
+    --bg:#F7F6F2;
     --ink:#14120F;
     --muted:#8D8A82;
   }
@@ -197,7 +197,6 @@
     max-height:100%;
     width:auto;
     height:auto;
-    box-shadow:0 12px 30px rgba(0,0,0,0.10);
   }
   .book-nav{
     display:flex;
@@ -503,7 +502,6 @@
   startHomeCollage('home-collage', homeImages);
 
 
-  const rightColumn      = document.getElementById('right');
   const framesWrap       = document.getElementById('frames-wrap');
   const gridPubblication = document.getElementById('grid-pubblication');
   const gridCollage      = document.getElementById('grid-collage');
@@ -511,7 +509,6 @@
   const listWorks        = document.getElementById('list-works');
   const bookViewer       = document.getElementById('book-viewer');
   const projectDescription = document.getElementById('project-description');
-  const mainNav          = document.querySelector('nav.main-nav');
   const navLinks         = document.querySelectorAll('[data-view]');
   const projectLinks     = document.querySelectorAll('[data-project]');
 
@@ -531,6 +528,15 @@
 
   let currentView = 'home';
 
+  // Mostra le cornici/griglia giuste per la sezione data, senza toccare
+  // il libro di foto (usata sia da showView sia da closeBook, che prima
+  // ripetevano le stesse tre righe).
+  function applyRightPanel(view){
+    framesWrap.style.display = (view === 'pubblication' || view === 'collage') ? 'none' : 'block';
+    gridPubblication.hidden  = (view !== 'pubblication');
+    gridCollage.hidden       = (view !== 'collage');
+  }
+
   function showView(view){
     currentView = view;
     projectDescription.hidden = true;
@@ -538,12 +544,7 @@
     listStories.hidden = (view !== 'stories');
     listWorks.hidden   = (view !== 'works');
 
-    rightColumn.style.display = 'block';
-    framesWrap.style.display  = (view === 'pubblication' || view === 'collage') ? 'none' : 'block';
-    gridPubblication.hidden   = (view !== 'pubblication');
-    gridCollage.hidden        = (view !== 'collage');
-
-    mainNav.style.display = 'flex';
+    applyRightPanel(view);
 
     bookViewer.hidden = true;
     projectLinks.forEach(a => a.classList.remove('active'));
@@ -606,11 +607,11 @@
 
     const prevBtn = document.createElement('button');
     prevBtn.type = 'button';
-    prevBtn.textContent = '';
+    prevBtn.textContent = '←';
 
     const nextBtn = document.createElement('button');
     nextBtn.type = 'button';
-    nextBtn.textContent = '';
+    nextBtn.textContent = '→';
 
     // BUG RISOLTO: prima qui dentro c'era "counter.textContent = ..."
     // ma "counter" non era mai stato creato da nessuna parte — questo
@@ -630,7 +631,14 @@
       render();
     }
 
-    stage.addEventListener('click', goNext);
+    // clic sulla metà sinistra della foto = pagina precedente,
+    // clic sulla metà destra = pagina successiva
+    stage.addEventListener('click', e => {
+      const rect = stage.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      if(clickX < rect.width / 2) goPrev();
+      else goNext();
+    });
     prevBtn.addEventListener('click', e => { e.stopPropagation(); goPrev(); });
     nextBtn.addEventListener('click', e => { e.stopPropagation(); goNext(); });
 
@@ -642,7 +650,6 @@
     bookViewer.appendChild(nav);
     render();
 
-    rightColumn.style.display = 'block';
     framesWrap.style.display = 'none';
     gridPubblication.hidden = true;
     gridCollage.hidden = true;
@@ -658,10 +665,7 @@
     bookViewer.hidden = true;
     projectDescription.hidden = true;
     projectLinks.forEach(a => a.classList.remove('active'));
-    rightColumn.style.display = 'block';
-    framesWrap.style.display = (currentView === 'pubblication' || currentView === 'collage') ? 'none' : 'block';
-    gridPubblication.hidden = (currentView !== 'pubblication');
-    gridCollage.hidden = (currentView !== 'collage');
+    applyRightPanel(currentView);
   }
 
   projectLinks.forEach(a => {
