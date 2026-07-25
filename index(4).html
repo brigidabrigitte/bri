@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brigida Brancale</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+<style>
+  /* ============================================================
+     VARIABILI COLORE — cambia questi 3 valori per cambiare la
+     palette di tutto il sito
+     ============================================================ */
+  :root{
+    --bg:#F7F6F2;
+    --ink:#14120F;
+    --muted:#8D8A82;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Instrument Sans', sans-serif;
+    height:100%;
+    overflow:hidden; /* la home è pensata per stare tutta in un unico schermo, senza scroll */
+  }
+  a{ color:inherit; text-decoration:none; }
+
+  /* ============================================================
+     LAYOUT GENERALE
+     ============================================================ */
+  .page{
+    display:flex;
+    height:100vh;
+    width:100vw;
+  }
+
+  .left{
+    width:42%;
+    position:relative;
+    padding:2.4rem 3vw;
+  }
+
+  .right{
+    width:58%;
+    position:relative;
+  }
+
+  .frames-wrap{
+    position:absolute;
+    inset:0;
+  }
+
+  /* ------------------------------------------------------------
+     GRIGLIA FOTO — usata da Pubblication e Collage
+     ------------------------------------------------------------ */
+  .photo-grid{
+    position:absolute;
+    inset:0;
+    padding:2.4rem 3vw;
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    grid-auto-rows:1fr;
+    gap:0.8rem;
+    overflow-y:auto;
+  }
+  .photo-grid img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+
+  /* ------------------------------------------------------------
+     NOME — angolo in alto a sinistra
+     ------------------------------------------------------------ */
+  .brand{
+    font-size:0.95rem;
+    font-weight:500;
+    letter-spacing:0.02em;
+  }
+
+  .name-block{
+    display:flex;
+    align-items:flex-start;
+    gap:3.5vw;
+  }
+
+  nav.main-nav{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:0.55rem;
+  }
+  nav.main-nav a{
+    font-size:0.95rem;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    position:relative;
+  }
+  nav.main-nav a::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:-2px;
+    height:1px; background:currentColor;
+    transform:scaleX(0); transform-origin:left;
+    transition:transform .3s ease;
+  }
+  nav.main-nav a:hover::after{ transform:scaleX(1); }
+  nav.main-nav a.active{ color:var(--muted); }
+
+  .project-list{
+    margin-top:2.6rem;
+  }
+  .project-list ul{
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap:0.7rem;
+  }
+  .project-list a{
+    font-size:1.4rem;
+    text-transform:uppercase;
+    letter-spacing:0.02em;
+    transition:opacity .25s ease;
+  }
+  .project-list a:hover{ opacity:0.55; }
+  .project-list a.active{ opacity:0.55; } /* FIX: evidenzia il progetto aperto nel libro */
+
+  .about-link{
+    position:absolute;
+    left:3vw; bottom:2.4rem;
+    font-size:0.95rem;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+
+  .email-link{
+    position:absolute;
+    right:3vw; bottom:2.4rem;
+    font-size:0.85rem;
+    color:var(--muted);
+    z-index:10; /* FIX: era 5, ora sempre sopra qualunque cornice/libro */
+  }
+  .email-link:hover{ color:var(--ink); }
+
+  /* ============================================================
+     CORNICI FOTOGRAFICHE
+     ============================================================ */
+  .frame{
+    position:absolute;
+    overflow:hidden;
+    box-shadow:0 12px 30px rgba(0,0,0,0.10);
+  }
+  .frame img{
+    position:absolute;
+    inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    opacity:0;
+    transition:opacity 0.9s ease;
+  }
+  .frame img.active{ opacity:1; }
+
+  /* FIX 4: non più tre cornici sovrapposte e ruotate, ma un'unica
+     cornice centrata con uno slideshow lineare (in ordine, non casuale) */
+  #frame-home{
+    top:10%;
+    left:50%;
+    width:56%;
+    height:80%;
+    transform:translateX(-50%);
+    z-index:1;
+  }
+
+  /* ============================================================
+     LIBRO DI FOTO — FIX: mancava completamente lo stile,
+     "book-viewer" era invisibile/non funzionante
+     ============================================================ */
+  .book{
+    position:absolute;
+    inset:0;
+    padding:2.4rem 3vw;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:1.2rem;
+  }
+  /* FIX 2: il libro ora mostra due foto affiancate (pagina sx/dx),
+     e uno "stage" con overflow nascosto dentro cui scorre una
+     striscia (.book-track) di coppie di pagine (.book-spread).
+     Cliccando sullo stage si passa alla coppia successiva con
+     un'animazione di scorrimento orizzontale. */
+  .book-stage{
+    position:relative;
+    width:100%;
+    max-width:74vw;
+    height:74%;
+    overflow:hidden;
+    cursor:pointer;
+  }
+  .book-track{
+    display:flex;
+    height:100%;
+    transition:transform 0.6s cubic-bezier(.65,0,.35,1);
+  }
+  .book-spread{
+    flex:0 0 100%;
+    display:flex;
+    gap:0.9rem;
+    height:100%;
+    justify-content:center;
+  }
+  .book-page{
+    flex:1 1 0;
+    height:100%;
+    overflow:hidden;
+    box-shadow:0 12px 30px rgba(0,0,0,0.10);
+  }
+  .book-page img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .book-page.empty{ visibility:hidden; } /* mantiene lo spazio quando le foto sono dispari */
+  .book-nav{
+    display:flex;
+    align-items:center;
+    gap:1.6rem;
+    font-size:0.85rem;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--muted);
+  }
+  .book-nav button{
+    background:none;
+    border:none;
+    cursor:pointer;
+    font-family:inherit;
+    font-size:1rem;
+    color:var(--ink);
+    padding:0.2rem 0.5rem;
+  }
+  .book-nav button:hover{ color:var(--muted); }
+  .book-close{
+    position:absolute;
+    top:2.4rem; right:3vw;
+    font-size:0.85rem;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .book-close:hover{ color:var(--muted); }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media(max-width:900px){
+    html,body{ overflow:auto; }
+    .page{ flex-direction:column; height:auto; }
+    .left, .right{ width:100%; }
+    .right{ height:80vh; margin-top:2rem; }
+    .about-link, .email-link{ position:static; margin-top:2rem; display:block; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="left">
+
+    <div class="name-block">
+      <a class="brand" href="index.html" data-view="home">Brigida Brancale</a>
+
+      <nav class="main-nav">
+        <a href="stories.html" data-view="stories">Stories</a>
+        <a href="work.html" data-view="works">Works</a>
+        <a href="publications.html" data-view="pubblication">Pubblication</a>
+        <a href="collage.html" data-view="collage">Collage</a>
+      </nav>
+    </div>
+
+    <div class="project-list" id="list-stories" hidden>
+      <ul>
+        <li><a href="stories.html#siwa" data-project="siwa">SIWA</a></li>
+        <li><a href="stories.html#cellulari" data-project="cellulari">Cellulari</a></li>
+        <li><a href="stories.html#abitare" data-project="abitare">Abitare</a></li>
+        <li><a href="stories.html#here-be-dragons" data-project="here-be-dragons">Here Be Dragons</a></li>
+      </ul>
+    </div>
+
+    <div class="project-list" id="list-works" hidden>
+      <ul>
+        <li><a href="work.html#canificio" data-project="canificio">Canificio</a></li>
+        <li><a href="work.html#memoria-collettiva" data-project="memoria-collettiva">Memoria Collettiva</a></li>
+        <li><a href="work.html#artiglieria" data-project="artiglieria">Artiglieria</a></li>
+        <li><a href="work.html#nanako" data-project="nanako">Nanako</a></li>
+        <li><a href="work.html#marcon" data-project="marcon">Marcon</a></li>
+        <li><a href="work.html#nanako2" data-project="nanako2">Nanako2</a></li>
+      </ul>
+    </div>
+
+    <a class="about-link" href="about.html">About</a>
+  </div>
+
+  <div class="right" id="right">
+    <div class="frames-wrap" id="frames-wrap">
+      <div class="frame" id="frame-home"></div>
+    </div>
+
+    <div class="photo-grid" id="grid-pubblication" hidden></div>
+    <div class="photo-grid" id="grid-collage" hidden></div>
+
+    <!-- FIX: ora questo contenitore viene davvero riempito da buildBook() -->
+    <div class="book" id="book-viewer" hidden></div>
+  </div>
+
+  <a class="email-link" href="mailto:mail@brigidabrancale.com">mail@brigidabrancale.com</a>
+
+</div>
+
+<script>
+  /* ============================================================
+     FOTO DELLA CORNICE HOME — FIX 4: prima erano tre liste per tre
+     cornici diverse, ora è un'unica lista per un'unica cornice che
+     scorre le foto in ordine, una dopo l'altra.
+     ============================================================ */
+  const homeImages = [
+    "https://picsum.photos/id/1015/700/900",
+    "https://picsum.photos/id/1041/700/900",
+    "https://picsum.photos/id/1043/700/900",
+    "https://picsum.photos/id/1039/700/900",
+    "https://picsum.photos/id/1074/700/900",
+    "https://picsum.photos/id/1080/700/900",
+    "https://picsum.photos/id/1062/700/900",
+    "https://picsum.photos/id/1069/700/900",
+    "https://picsum.photos/id/1084/700/900"
+  ];
+
+  /* ============================================================
+     FOTO DELLE GRIGLIE — Pubblication e Collage
+     ============================================================ */
+  const pubblicationImages = [
+    "https://picsum.photos/id/1011/500/500",
+    "https://picsum.photos/id/1025/500/500",
+    "https://picsum.photos/id/1035/500/500",
+    "https://picsum.photos/id/1050/500/500",
+    "https://picsum.photos/id/1059/500/500",
+    "https://picsum.photos/id/1060/500/500"
+  ];
+  const collageImages = [
+    "https://picsum.photos/id/1027/500/500",
+    "https://picsum.photos/id/1031/500/500",
+    "https://picsum.photos/id/1033/500/500",
+    "https://picsum.photos/id/1044/500/500",
+    "https://picsum.photos/id/1053/500/500",
+    "https://picsum.photos/id/1057/500/500"
+  ];
+
+  /* ============================================================
+     FOTO DI OGNI PROGETTO (libro) — FIX: questo elenco mancava
+     del tutto, per questo il libro non poteva funzionare.
+     >>> QUI VANNO LE TUE FOTO, una lista per ogni progetto <<<
+     Le chiavi devono coincidere con i valori "data-project" nel
+     menu (SIWA -> "siwa", Here Be Dragons -> "here-be-dragons", ecc.)
+     ============================================================ */
+  const projectImages = {
+    "siwa": [
+      "https://picsum.photos/seed/siwa1/900/1200",
+      "https://picsum.photos/seed/siwa2/900/1200",
+      "https://picsum.photos/seed/siwa3/900/1200"
+    ],
+    "cellulari": [
+      "https://picsum.photos/seed/cellulari1/900/1200",
+      "https://picsum.photos/seed/cellulari2/900/1200"
+    ],
+    "abitare": [
+      "https://picsum.photos/seed/abitare1/900/1200",
+      "https://picsum.photos/seed/abitare2/900/1200"
+    ],
+    "here-be-dragons": [
+      "https://picsum.photos/seed/dragons1/900/1200",
+      "https://picsum.photos/seed/dragons2/900/1200"
+    ],
+    "canificio": [
+      "https://picsum.photos/seed/canificio1/900/1200",
+      "https://picsum.photos/seed/canificio2/900/1200"
+    ],
+    "memoria-collettiva": [
+      "https://picsum.photos/seed/memoria1/900/1200",
+      "https://picsum.photos/seed/memoria2/900/1200"
+    ],
+    "artiglieria": [
+      "https://picsum.photos/seed/artiglieria1/900/1200",
+      "https://picsum.photos/seed/artiglieria2/900/1200"
+    ],
+    "nanako": [
+      "https://picsum.photos/seed/nanako1/900/1200",
+      "https://picsum.photos/seed/nanako2a/900/1200"
+    ],
+    "marcon": [
+      "https://picsum.photos/seed/marcon1/900/1200",
+      "https://picsum.photos/seed/marcon2/900/1200"
+    ],
+    "nanako2": [
+      "https://picsum.photos/seed/nanako2b/900/1200",
+      "https://picsum.photos/seed/nanako2c/900/1200"
+    ]
+  };
+
+  function fillGrid(containerId, images){
+    const container = document.getElementById(containerId);
+    images.forEach(src => {
+      const img = document.createElement('img');
+      img.src = src;
+      container.appendChild(img);
+    });
+  }
+  fillGrid('grid-pubblication', pubblicationImages);
+  fillGrid('grid-collage', collageImages);
+
+  /* ============================================================
+     SLIDESHOW LINEARE — un'unica cornice, immagini in ordine
+     (FIX 4: prima erano 3 cornici con cambio a caso, ora una sola
+     cornice che scorre dritta, una foto dopo l'altra, in loop)
+     ============================================================ */
+  function slideshow(containerId, images, intervalMs = 2600){
+    const container = document.getElementById(containerId);
+
+    images.forEach((src, i) => {
+      const img = document.createElement('img');
+      img.src = src;
+      if(i === 0) img.classList.add('active');
+      container.appendChild(img);
+    });
+
+    const imgEls = container.querySelectorAll('img');
+    let current = 0;
+
+    if(imgEls.length < 2) return;
+
+    setInterval(() => {
+      imgEls[current].classList.remove('active');
+      current = (current + 1) % imgEls.length;
+      imgEls[current].classList.add('active');
+    }, intervalMs);
+  }
+
+  slideshow('frame-home', homeImages);
+
+
+  /* ============================================================
+     CAMBIO VISTA — Home / Stories / Works / Pubblication / Collage
+     ============================================================ */
+  const rightColumn      = document.getElementById('right');
+  const framesWrap       = document.getElementById('frames-wrap');
+  const gridPubblication = document.getElementById('grid-pubblication');
+  const gridCollage      = document.getElementById('grid-collage');
+  const listStories      = document.getElementById('list-stories');
+  const listWorks        = document.getElementById('list-works');
+  const bookViewer       = document.getElementById('book-viewer');
+  const mainNav          = document.querySelector('nav.main-nav'); /* FIX 3: menu Stories/Works/Pubblication/Collage */
+  const navLinks         = document.querySelectorAll('[data-view]');
+  const projectLinks     = document.querySelectorAll('[data-project]');
+
+  let currentView = 'home'; // FIX: serve per sapere dove tornare quando si chiude il libro
+
+  function showView(view){
+    currentView = view;
+
+    listStories.hidden = (view !== 'stories');
+    listWorks.hidden   = (view !== 'works');
+
+    const hideRight = (view === 'stories' || view === 'works');
+    rightColumn.style.display = hideRight ? 'none' : 'block';
+    framesWrap.style.display  = (view === 'home') ? 'block' : 'none';
+    gridPubblication.hidden   = (view !== 'pubblication');
+    gridCollage.hidden        = (view !== 'collage');
+
+    // FIX 3: fuori dalla home il menu sparisce del tutto — resta
+    // visibile solo il nome "Brigida Brancale", che riporta alla home
+    mainNav.style.display = (view === 'home') ? 'flex' : 'none';
+
+    bookViewer.hidden = true; // FIX: il libro si chiude ogni volta che si cambia vista dal menu
+    projectLinks.forEach(a => a.classList.remove('active'));
+
+    navLinks.forEach(a => a.classList.toggle('active', a.dataset.view === view));
+  }
+
+  navLinks.forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      showView(a.dataset.view);
+    });
+  });
+
+  /* ============================================================
+     LIBRO DI FOTO — FIX: prima non esisteva alcun listener sui
+     link dei singoli progetti (data-project), quindi cliccando
+     su "SIWA", "Canificio" ecc. il browser tentava di aprire
+     stories.html / work.html invece di mostrare le foto.
+     ============================================================ */
+  let bookImages = [];
+  let spreadIndex = 0;
+
+  function buildBook(key, linkEl){
+    bookImages = projectImages[key] || [];
+    spreadIndex = 0;
+    bookViewer.innerHTML = '';
+
+    if(bookImages.length === 0){
+      const empty = document.createElement('p');
+      empty.textContent = 'Nessuna foto trovata per questo progetto.';
+      bookViewer.appendChild(empty);
+      bookViewer.hidden = false;
+      return;
+    }
+
+    // raggruppa le foto a coppie: [0,1], [2,3], [4,5]... (l'ultima
+    // coppia può avere una sola foto se il totale è dispari)
+    const spreads = [];
+    for(let i = 0; i < bookImages.length; i += 2){
+      spreads.push([bookImages[i], bookImages[i + 1] || null]);
+    }
+
+    const closeBtn = document.createElement('a');
+    closeBtn.href = '#';
+    closeBtn.className = 'book-close';
+    closeBtn.textContent = 'Chiudi ×';
+    closeBtn.addEventListener('click', e => {
+      e.preventDefault();
+      closeBook();
+    });
+
+    // lo "stage" mostra sempre una coppia di pagine; la "track" al
+    // suo interno contiene tutte le coppie una via l'altra e scorre
+    // orizzontalmente (transform: translateX) quando si cambia pagina
+    const stage = document.createElement('div');
+    stage.className = 'book-stage';
+
+    const track = document.createElement('div');
+    track.className = 'book-track';
+
+    spreads.forEach(pair => {
+      const spread = document.createElement('div');
+      spread.className = 'book-spread';
+      pair.forEach(src => {
+        const page = document.createElement('div');
+        page.className = 'book-page' + (src ? '' : ' empty');
+        if(src){
+          const img = document.createElement('img');
+          img.src = src;
+          page.appendChild(img);
+        }
+        spread.appendChild(page);
+      });
+      track.appendChild(spread);
+    });
+
+    stage.appendChild(track);
+
+    const nav = document.createElement('div');
+    nav.className = 'book-nav';
+
+    const prevBtn = document.createElement('button');
+    prevBtn.type = 'button';
+    prevBtn.textContent = '←';
+
+    const counter = document.createElement('span');
+
+    const nextBtn = document.createElement('button');
+    nextBtn.type = 'button';
+    nextBtn.textContent = '→';
+
+    function render(){
+      track.style.transform = `translateX(-${spreadIndex * 100}%)`;
+      counter.textContent = (spreadIndex + 1) + ' / ' + spreads.length;
+    }
+
+    function goNext(){
+      spreadIndex = (spreadIndex + 1) % spreads.length;
+      render();
+    }
+    function goPrev(){
+      spreadIndex = (spreadIndex - 1 + spreads.length) % spreads.length;
+      render();
+    }
+
+    // FIX 2: cliccando sul libro si sfoglia la pagina successiva
+    // con l'animazione di scorrimento; le frecce restano come
+    // alternativa (stopPropagation per non far scattare anche il click sullo stage)
+    stage.addEventListener('click', goNext);
+    prevBtn.addEventListener('click', e => { e.stopPropagation(); goPrev(); });
+    nextBtn.addEventListener('click', e => { e.stopPropagation(); goNext(); });
+
+    nav.appendChild(prevBtn);
+    nav.appendChild(counter);
+    nav.appendChild(nextBtn);
+
+    bookViewer.appendChild(closeBtn);
+    bookViewer.appendChild(stage);
+    bookViewer.appendChild(nav);
+    render();
+
+    // mostra il libro al posto di cornici/griglie sulla destra
+    rightColumn.style.display = 'block';
+    framesWrap.style.display = 'none';
+    gridPubblication.hidden = true;
+    gridCollage.hidden = true;
+    bookViewer.hidden = false;
+
+    // evidenzia il progetto aperto nella lista a sinistra
+    projectLinks.forEach(a => a.classList.toggle('active', a === linkEl));
+  }
+
+  function closeBook(){
+    bookViewer.hidden = true;
+    projectLinks.forEach(a => a.classList.remove('active'));
+    // torna alla vista che era aperta prima (stories o works)
+    const hideRight = (currentView === 'stories' || currentView === 'works');
+    rightColumn.style.display = hideRight ? 'none' : 'block';
+    framesWrap.style.display = (currentView === 'home') ? 'block' : 'none';
+    gridPubblication.hidden = (currentView !== 'pubblication');
+    gridCollage.hidden = (currentView !== 'collage');
+  }
+
+  projectLinks.forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      buildBook(a.dataset.project, a);
+    });
+  });
+
+  // FIX: mancava lo stato iniziale — senza questa chiamata la voce
+  // "Brigida Brancale" non risultava evidenziata come vista attiva
+  // al caricamento della pagina.
+  showView('home');
+</script>
+
+</body>
+</html>
