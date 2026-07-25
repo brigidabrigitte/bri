@@ -191,38 +191,33 @@
   .book-spread{
     flex:0 0 100%;
     display:flex;
-    gap:0; /* FIX 8: niente più spazio tra le due pagine, si toccano come in un libro rilegato */
+    align-items:flex-start; /* FIX 10: pagine allineate in alto, anche quando hanno altezze diverse */
+    gap:0; /* niente più spazio tra le due pagine, si toccano come in un libro rilegato */
     height:100%;
     justify-content:center;
   }
   .book-page{
-    flex:1 1 0;
-    height:100%;
-    overflow:hidden;
-    background:#fff; /* riempie di bianco lo spazio che resta sotto le foto orizzontali */
-    box-shadow:0 12px 30px rgba(0,0,0,0.10);
+    height:100%; /* limite massimo di altezza — la foto può essere più bassa, la pagina no */
+    max-width:50%; /* limite massimo di larghezza — la pagina non supera mai metà dello stage */
     display:flex;
+    align-items:flex-start;
     justify-content:center;
+    overflow:hidden; /* rete di sicurezza, non dovrebbe mai tagliare data la regola sotto */
   }
-  /* FIX 8: piccola ombra interna sul bordo dove le due pagine si toccano,
+  /* FIX 10: piccola ombra sul bordo dove le due pagine si toccano,
      per simulare la piega/rilegatura al centro del libro */
-  .book-page:first-child{
+  .book-page:first-child img{
     box-shadow:0 12px 30px rgba(0,0,0,0.10), inset -10px 0 14px -12px rgba(0,0,0,0.35);
   }
-  .book-page:last-child{
+  .book-page:last-child img{
     box-shadow:0 12px 30px rgba(0,0,0,0.10), inset 10px 0 14px -12px rgba(0,0,0,0.35);
   }
   .book-page img{
-    width:100%;
-    height:100%;
-    object-fit:cover; /* FIX 8: default per le verticali — riempiono tutta la pagina, niente spazi bianchi */
     display:block;
-  }
-  /* FIX 8: solo le orizzontali (rilevate via JS) restano intere e allineate
-     in alto, con lo spazio bianco sotto — le verticali usano "cover" sopra */
-  .book-page img.is-landscape{
-    object-fit:contain;
-    object-position:top center;
+    max-width:100%;
+    max-height:100%;
+    width:auto;
+    height:auto; /* FIX 10: la foto mantiene le sue proporzioni naturali — niente crop, niente riempimento forzato */
   }
   .book-page.empty{ visibility:hidden; }
   .book-nav{
@@ -538,13 +533,6 @@
         page.className = 'book-page' + (src ? '' : ' empty');
         if(src){
           const img = document.createElement('img');
-          // FIX 8: rileva se la foto è orizzontale o verticale non appena
-          // è caricata, per decidere come mostrarla (vedi CSS .is-landscape)
-          img.addEventListener('load', () => {
-            if(img.naturalWidth > img.naturalHeight){
-              img.classList.add('is-landscape');
-            }
-          });
           img.src = src;
           page.appendChild(img);
         }
