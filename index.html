@@ -70,7 +70,7 @@
   }
 
   .brand{
-    font-size:0.78rem; /* FIX 22: font DM Mono, peso Light 300, tutto un po' più piccolo e uniforme */
+    font-size:0.78rem;
     font-weight:300;
     letter-spacing:0.02em;
   }
@@ -107,8 +107,6 @@
     z-index:2; /* il menu e le sue liste restano sempre sopra le foto */
   }
 
-  /* FIX 21: la lista progetti è di nuovo verticale — è una colonna a
-     parte, sempre a fianco del menu, e non lo sposta mai */
   .project-list ul{
     list-style:none;
     display:flex;
@@ -116,7 +114,7 @@
     gap:0.6rem;
   }
   .project-list a{
-    font-size:0.78rem; /* stessa dimensione delle voci del menu */
+    font-size:0.78rem;
     text-transform:lowercase;
     letter-spacing:0.04em;
     transition:opacity .25s ease;
@@ -132,7 +130,6 @@
     letter-spacing:0.04em;
   }
 
-  /* FIX 20: testo di spiegazione del progetto, sopra "About" in basso a sinistra */
   .project-description{
     position:absolute;
     left:3vw; right:6vw;
@@ -151,11 +148,6 @@
   }
   .email-link:hover{ color:var(--ink); }
 
-  /* FIX 17: niente ombra, niente rotazione — foto dritte. Le posizioni
-     sono casuali con controllo anti-sovrapposizione (vedi JS), e ora
-     anche la dimensione di ogni foto è casuale (min. 300px) — questo
-     aiuta a riempire meglio lo spazio quando quelle già piazzate non
-     lasciano più posto per foto grandi. */
   .home-collage{
     position:absolute;
     inset:0;
@@ -166,7 +158,6 @@
     height:auto;
     opacity:0;
     transition:opacity 0.8s ease;
-    /* max-width e max-height vengono impostati via JS, diversi per ogni foto */
   }
   .collage-photo.visible{ opacity:1; }
 
@@ -193,8 +184,6 @@
     height:100%;
     transition:transform 0.6s cubic-bezier(.65,0,.35,1);
   }
-  /* FIX 11: niente più coppie di pagine — una sola foto per slide,
-     con un semplice scorrimento orizzontale al click */
   .book-slide{
     flex:0 0 100%;
     display:flex;
@@ -207,7 +196,7 @@
     max-width:100%;
     max-height:100%;
     width:auto;
-    height:auto; /* dimensioni naturali, niente crop */
+    height:auto;
     box-shadow:0 12px 30px rgba(0,0,0,0.10);
   }
   .book-nav{
@@ -263,8 +252,6 @@
         <a href="collage.html" data-view="collage">Collage</a>
       </nav>
 
-      <!-- FIX 21: seconda colonna, in verticale, a destra del menu —
-           il menu non si sposta mai qualunque lista sia aperta -->
       <div class="project-list" id="list-stories" hidden>
         <ul>
           <li><a href="stories.html#siwa" data-project="siwa">SIWA</a></li>
@@ -285,8 +272,6 @@
       </div>
     </div>
 
-    <!-- FIX 20: testo di spiegazione del progetto aperto — compare solo
-         quando apri una storia/lavoro specifico (es. SIWA) -->
     <div class="project-description" id="project-description" hidden></div>
 
     <a class="about-link" href="about.html">About</a>
@@ -332,7 +317,7 @@
     "IMAGES/SIWA05.jpg",
     "IMAGES/SIWA06.jpg",
     "IMAGES/SIWA07.jpg",
-    "IMAGES/SIWA08.jpg",
+    "IMAGES/SIWA08.jpg"
   ];
 
   const pubblicationImages = [
@@ -358,7 +343,7 @@
       "IMAGES/SIWA05.jpg","IMAGES/SIWA06.jpg","IMAGES/SIWA07.jpg","IMAGES/SIWA08.jpg",
       "IMAGES/SIWA09.jpg","IMAGES/SIWA10.jpg","IMAGES/SIWA11.jpg","IMAGES/SIWA12.jpg",
       "IMAGES/SIWA13.jpg","IMAGES/SIWA14.jpg","IMAGES/SIWA15.jpg","IMAGES/SIWA16.jpg",
-      "IMAGES/SIWA17.jpg","IMAGES/SIWA18.jpg","IMAGES/SIWA19.jpg","IMAGES/SIWA20.jpg",
+      "IMAGES/SIWA17.jpg","IMAGES/SIWA18.jpg","IMAGES/SIWA19.jpg","IMAGES/SIWA20.jpg"
     ],
     "cellulari": [
       "IMAGES/PHONES - 001.jpg","IMAGES/PHONES - 002.jpg","IMAGES/PHONES - 003.jpg","IMAGES/PHONES - 004.jpg",
@@ -367,7 +352,7 @@
       "IMAGES/PHONES - 0013.jpg","IMAGES/PHONES - 0014.jpg","IMAGES/PHONES - 0015.jpg","IMAGES/PHONES - 0016.jpg",
       "IMAGES/PHONES - 0017.jpg","IMAGES/PHONES - 0018.jpg","IMAGES/PHONES - 0019.jpg","IMAGES/PHONES - 0020.jpg",
       "IMAGES/PHONES - 0021.jpg","IMAGES/PHONES - 0022.jpg","IMAGES/PHONES - 0023.jpg","IMAGES/PHONES - 0024.jpg",
-      "IMAGES/PHONES - 0025.jpg","IMAGES/PHONES - 0026.jpg",
+      "IMAGES/PHONES - 0025.jpg","IMAGES/PHONES - 0026.jpg"
     ],
     "abitare": [
       "https://picsum.photos/seed/abitare1/900/1200",
@@ -380,7 +365,7 @@
       "IMAGES/HBD14.jpg","IMAGES/HBD15.jpg","IMAGES/HBD16.jpg","IMAGES/HBD17.jpg",
       "IMAGES/HBD18.jpg","IMAGES/HBD19.jpg","IMAGES/HBD20.jpg","IMAGES/HBD21.jpg",
       "IMAGES/HBD22.jpg","IMAGES/HBD23.jpg","IMAGES/HBD24.jpg","IMAGES/HBD25.jpg",
-      "IMAGES/HBD26.jpg","IMAGES/HBD27.jpg","IMAGES/HBD28.jpg",
+      "IMAGES/HBD26.jpg","IMAGES/HBD27.jpg","IMAGES/HBD28.jpg"
     ],
     "canificio": [
       "https://picsum.photos/seed/canificio1/900/1200",
@@ -428,11 +413,9 @@
     return a;
   }
 
-  /* FIX 18: tolto il minimo di 300px — dimensioni casuali più piccole,
-     così le foto non risultano troppo grandi sullo schermo. */
   function randomCollageSize(){
-    const w = 140 + Math.random() * 200;               // 140–340px di larghezza massima
-    const h = w * (1.1 + Math.random() * 0.5);         // altezza massima proporzionata, con un po' di variazione
+    const w = 140 + Math.random() * 200;
+    const h = w * (1.1 + Math.random() * 0.5);
     return { w, h };
   }
 
@@ -448,26 +431,16 @@
       );
       if(!collision) return { x, y };
     }
-    return null; // nessuno spazio libero trovato adesso, si riprova al giro dopo
+    return null;
   }
 
-  /* ============================================================
-     COLLAGE — home
-     Le foto compaiono una alla volta, a intervalli casuali, in
-     posizioni e dimensioni casuali che non si sovrappongono mai fra
-     loro, e restano visibili accumulandosi. Quando se ne sono
-     accumulate "maxVisible", dopo una breve pausa spariscono tutte
-     insieme e il ciclo ricomincia da capo con un nuovo ordine casuale.
-     >>> Per cambiare quante foto si accumulano prima di svuotare,
-     modifica il numero "maxVisible" qui sotto. <<<
-     ============================================================ */
   function startHomeCollage(containerId, images, maxVisible = 8){
     const container = document.getElementById(containerId);
     if(images.length === 0) return;
 
     let deck = shuffle(images);
     let deckIndex = 0;
-    let shown = []; // { img, x, y, halfW, halfH }
+    let shown = [];
 
     function nextImage(){
       if(deckIndex >= deck.length){
@@ -483,7 +456,6 @@
       const halfH = size.h / 2;
       const pos = findFreePosition(container, halfW, halfH, shown);
       if(!pos){
-        // nessuno spazio libero adesso per questa dimensione, riprova più tardi
         scheduleNext();
         return;
       }
@@ -496,7 +468,7 @@
       img.style.maxHeight = size.h + 'px';
       img.style.left = pos.x + 'px';
       img.style.top = pos.y + 'px';
-      img.style.transform = 'translate(-50%, -50%)'; // niente rotazione, foto dritte
+      img.style.transform = 'translate(-50%, -50%)';
       img.src = src;
 
       container.appendChild(img);
@@ -543,8 +515,6 @@
   const navLinks         = document.querySelectorAll('[data-view]');
   const projectLinks     = document.querySelectorAll('[data-project]');
 
-  // FIX 20: testo di spiegazione per ogni progetto — le chiavi devono
-  // coincidere con quelle di "projectImages" qui sopra.
   // >>> QUI VA IL TESTO VERO PER OGNI PROGETTO <<<
   const projectDescriptions = {
     "siwa": "Testo di presentazione del progetto SIWA — sostituisci con il tuo testo.",
@@ -563,13 +533,11 @@
 
   function showView(view){
     currentView = view;
-    projectDescription.hidden = true; // il testo si nasconde ogni volta che cambi vista dal menu
+    projectDescription.hidden = true;
 
     listStories.hidden = (view !== 'stories');
     listWorks.hidden   = (view !== 'works');
 
-    // FIX 12: la colonna destra e il menu non spariscono più — restano
-    // sempre visibili, anche quando apri Stories o Works
     rightColumn.style.display = 'block';
     framesWrap.style.display  = (view === 'pubblication' || view === 'collage') ? 'none' : 'block';
     gridPubblication.hidden   = (view !== 'pubblication');
@@ -621,7 +589,7 @@
     const track = document.createElement('div');
     track.className = 'book-track';
 
-    // FIX 11: una slide per ogni foto, non più a coppie
+    // una slide per ogni foto
     bookImages.forEach(src => {
       const slide = document.createElement('div');
       slide.className = 'book-slide';
@@ -644,9 +612,13 @@
     nextBtn.type = 'button';
     nextBtn.textContent = '→';
 
+    // BUG RISOLTO: prima qui dentro c'era "counter.textContent = ..."
+    // ma "counter" non era mai stato creato da nessuna parte — questo
+    // mandava in errore tutta la funzione buildBook e faceva sì che il
+    // libro non si aprisse mai. Il counter è stato tolto del tutto,
+    // come richiesto, quindi render() ora si occupa solo di scorrere.
     function render(){
       track.style.transform = `translateX(-${slideIndex * 100}%)`;
-      counter.textContent = (slideIndex + 1) + ' / ' + bookImages.length;
     }
 
     function goNext(){
@@ -663,9 +635,7 @@
     nextBtn.addEventListener('click', e => { e.stopPropagation(); goNext(); });
 
     nav.appendChild(prevBtn);
-    nav.appendChild(counter);
     nav.appendChild(nextBtn);
-
 
     bookViewer.appendChild(closeBtn);
     bookViewer.appendChild(stage);
@@ -678,7 +648,6 @@
     gridCollage.hidden = true;
     bookViewer.hidden = false;
 
-    // FIX 20: mostra il testo di spiegazione del progetto appena aperto
     projectDescription.textContent = projectDescriptions[key] || '';
     projectDescription.hidden = !projectDescriptions[key];
 
@@ -687,10 +656,8 @@
 
   function closeBook(){
     bookViewer.hidden = true;
-    projectDescription.hidden = true; // FIX 20: il testo sparisce insieme al progetto
+    projectDescription.hidden = true;
     projectLinks.forEach(a => a.classList.remove('active'));
-    // FIX 12: la colonna destra resta sempre visibile, tornano le foto della
-    // home tranne quando si sta guardando Pubblication o Collage
     rightColumn.style.display = 'block';
     framesWrap.style.display = (currentView === 'pubblication' || currentView === 'collage') ? 'none' : 'block';
     gridPubblication.hidden = (currentView !== 'pubblication');
