@@ -102,6 +102,678 @@
   nav.main-nav a:hover::after{ transform:scaleX(1); }
   nav.main-nav a.active{ color:var(--muted); }
 
+  .nav-row{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:1.1rem;
+  }
+
+  .project-list ul{
+    list-style:none;
+    display:flex;
+    flex-direction:row;
+    flex-wrap:wrap;
+    gap:1.1rem;
+  }
+  .project-list a{
+    font-size:0.95rem; /* FIX 15: stessa dimensione delle voci del menu (era 1.4rem) */
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    transition:opacity .25s ease;
+  }
+  .project-list a:hover{ opacity:0.55; }
+  .project-list a.active{ opacity:0.55; }
+
+  .about-link{
+    position:absolute;
+    left:3vw; bottom:2.4rem;
+    font-size:0.95rem;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+
+  .email-link{
+    position:absolute;
+    right:3vw; bottom:2.4rem;
+    font-size:0.85rem;
+    color:var(--muted);
+    z-index:10;
+  }
+  .email-link:hover{ color:var(--ink); }
+
+  /* FIX 14: niente ombra, niente rotazione — foto dritte. Le posizioni
+     ora vengono da una griglia fissa (vedi HOME_SLOTS in JS) invece
+     che completamente casuali, così due foto non si sovrappongono mai. */
+  .home-collage{
+    position:absolute;
+    inset:0;
+  }
+  .collage-photo{
+    position:absolute;
+    max-width:22%;
+    max-height:40%;
+    width:auto;
+    height:auto;
+    opacity:0;
+    transition:opacity 0.8s ease;
+  }
+  .collage-photo.visible{ opacity:1; }
+
+  .book{
+    position:absolute;
+    inset:0;
+    padding:2.4rem 3vw;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:1.2rem;
+  }
+  .book-stage{
+    position:relative;
+    width:100%;
+    max-width:74vw;
+    height:74%;
+    overflow:hidden;
+    cursor:pointer;
+  }
+  .book-track{
+    display:flex;
+    height:100%;
+    transition:transform 0.6s cubic-bezier(.65,0,.35,1);
+  }
+  /* FIX 11: niente più coppie di pagine — una sola foto per slide,
+     con un semplice scorrimento orizzontale al click */
+  .book-slide{
+    flex:0 0 100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:100%;
+  }
+  .book-slide img{
+    display:block;
+    max-width:100%;
+    max-height:100%;
+    width:auto;
+    height:auto; /* dimensioni naturali, niente crop */
+    box-shadow:0 12px 30px rgba(0,0,0,0.10);
+  }
+  .book-nav{
+    display:flex;
+    align-items:center;
+    gap:1.6rem;
+    font-size:0.85rem;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--muted);
+  }
+  .book-nav button{
+    background:none;
+    border:none;
+    cursor:pointer;
+    font-family:inherit;
+    font-size:1rem;
+    color:var(--ink);
+    padding:0.2rem 0.5rem;
+  }
+  .book-nav button:hover{ color:var(--muted); }
+  .book-close{
+    position:absolute;
+    top:2.4rem; right:3vw;
+    font-size:0.85rem;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .book-close:hover{ color:var(--muted); }
+
+  @media(max-width:900px){
+    html,body{ overflow:auto; }
+    .page{ flex-direction:column; height:auto; }
+    .left, .right{ width:100%; }
+    .right{ height:80vh; margin-top:2rem; }
+    .about-link, .email-link{ position:static; margin-top:2rem; display:block; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="left">
+
+    <div class="name-block">
+      <a class="brand" href="index.html" data-view="home">Brigida Brancale</a>
+
+      <nav class="main-nav">
+        <div class="nav-row">
+          <a href="stories.html" data-view="stories">Stories</a>
+          <div class="project-list" id="list-stories" hidden>
+            <ul>
+              <li><a href="stories.html#siwa" data-project="siwa">SIWA</a></li>
+              <li><a href="stories.html#cellulari" data-project="cellulari">Cellulari</a></li>
+              <li><a href="stories.html#abitare" data-project="abitare">Abitare</a></li>
+              <li><a href="stories.html#here-be-dragons" data-project="here-be-dragons">Here Be Dragons</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="nav-row">
+          <a href="work.html" data-view="works">Works</a>
+          <div class="project-list" id="list-works" hidden>
+            <ul>
+              <li><a href="work.html#canificio" data-project="canificio">Canificio</a></li>
+              <li><a href="work.html#memoria-collettiva" data-project="memoria-collettiva">Memoria Collettiva</a></li>
+              <li><a href="work.html#artiglieria" data-project="artiglieria">Artiglieria</a></li>
+              <li><a href="work.html#nanako" data-project="nanako">Nanako</a></li>
+              <li><a href="work.html#marcon" data-project="marcon">Marcon</a></li>
+              <li><a href="work.html#nanako2" data-project="nanako2">Nanako2</a></li>
+            </ul>
+          </div>
+        </div>
+        <a href="publications.html" data-view="pubblication">Pubblication</a>
+        <a href="collage.html" data-view="collage">Collage</a>
+      </nav>
+    </div>
+
+    <a class="about-link" href="about.html">About</a>
+  </div>
+
+  <div class="right" id="right">
+    <div class="frames-wrap" id="frames-wrap">
+      <div class="home-collage" id="home-collage"></div>
+    </div>
+
+    <div class="photo-grid" id="grid-pubblication" hidden></div>
+    <div class="photo-grid" id="grid-collage" hidden></div>
+
+    <div class="book" id="book-viewer" hidden></div>
+  </div>
+
+  <a class="email-link" href="mailto:mail@brigidabrancale.com">mail@brigidabrancale.com</a>
+
+</div>
+
+<script>
+  const homeImages = [
+    "IMAGES/HBD01.jpg",
+    "IMAGES/HBD02.jpg",
+    "IMAGES/HBD03.jpg",
+    "IMAGES/HBD04.jpg",
+    "IMAGES/HBD05.jpg",
+    "IMAGES/HBD06.jpg",
+    "IMAGES/HBD07.jpg",
+    "IMAGES/HBD08.jpg",
+    "IMAGES/PHONES - 001.jpg",
+    "IMAGES/PHONES - 002.jpg",
+    "IMAGES/PHONES - 003.jpg",
+    "IMAGES/PHONES - 004.jpg",
+    "IMAGES/PHONES - 005.jpg",
+    "IMAGES/PHONES - 006.jpg",
+    "IMAGES/PHONES - 007.jpg",
+    "IMAGES/PHONES - 008.jpg",
+    "IMAGES/SIWA01.jpg",
+    "IMAGES/SIWA02.jpg",
+    "IMAGES/SIWA03.jpg",
+    "IMAGES/SIWA04.jpg",
+    "IMAGES/SIWA05.jpg",
+    "IMAGES/SIWA06.jpg",
+    "IMAGES/SIWA07.jpg",
+    "IMAGES/SIWA08.jpg",
+  ];
+
+  const pubblicationImages = [
+    "https://picsum.photos/id/1011/500/500",
+    "https://picsum.photos/id/1025/500/500",
+    "https://picsum.photos/id/1035/500/500",
+    "https://picsum.photos/id/1050/500/500",
+    "https://picsum.photos/id/1059/500/500",
+    "https://picsum.photos/id/1060/500/500"
+  ];
+  const collageImages = [
+    "https://picsum.photos/id/1027/500/500",
+    "https://picsum.photos/id/1031/500/500",
+    "https://picsum.photos/id/1033/500/500",
+    "https://picsum.photos/id/1044/500/500",
+    "https://picsum.photos/id/1053/500/500",
+    "https://picsum.photos/id/1057/500/500"
+  ];
+
+  const projectImages = {
+    "siwa": [
+      "IMAGES/SIWA01.jpg","IMAGES/SIWA02.jpg","IMAGES/SIWA03.jpg","IMAGES/SIWA04.jpg",
+      "IMAGES/SIWA05.jpg","IMAGES/SIWA06.jpg","IMAGES/SIWA07.jpg","IMAGES/SIWA08.jpg",
+      "IMAGES/SIWA09.jpg","IMAGES/SIWA10.jpg","IMAGES/SIWA11.jpg","IMAGES/SIWA12.jpg",
+      "IMAGES/SIWA13.jpg","IMAGES/SIWA14.jpg","IMAGES/SIWA15.jpg","IMAGES/SIWA16.jpg",
+      "IMAGES/SIWA17.jpg","IMAGES/SIWA18.jpg","IMAGES/SIWA19.jpg","IMAGES/SIWA20.jpg",
+    ],
+    "cellulari": [
+      "IMAGES/PHONES - 001.jpg","IMAGES/PHONES - 002.jpg","IMAGES/PHONES - 003.jpg","IMAGES/PHONES - 004.jpg",
+      "IMAGES/PHONES - 005.jpg","IMAGES/PHONES - 006.jpg","IMAGES/PHONES - 007.jpg","IMAGES/PHONES - 008.jpg",
+      "IMAGES/PHONES - 009.jpg","IMAGES/PHONES - 0010.jpg","IMAGES/PHONES - 0011.jpg","IMAGES/PHONES - 0012.jpg",
+      "IMAGES/PHONES - 0013.jpg","IMAGES/PHONES - 0014.jpg","IMAGES/PHONES - 0015.jpg","IMAGES/PHONES - 0016.jpg",
+      "IMAGES/PHONES - 0017.jpg","IMAGES/PHONES - 0018.jpg","IMAGES/PHONES - 0019.jpg","IMAGES/PHONES - 0020.jpg",
+      "IMAGES/PHONES - 0021.jpg","IMAGES/PHONES - 0022.jpg","IMAGES/PHONES - 0023.jpg","IMAGES/PHONES - 0024.jpg",
+      "IMAGES/PHONES - 0025.jpg","IMAGES/PHONES - 0026.jpg",
+    ],
+    "abitare": [
+      "https://picsum.photos/seed/abitare1/900/1200",
+      "https://picsum.photos/seed/abitare2/900/1200"
+    ],
+    "here-be-dragons": [
+      "IMAGES/HBD01.jpg","IMAGES/HBD02.jpg","IMAGES/HBD03.jpg","IMAGES/HBD04.jpg",
+      "IMAGES/HBD05.jpg","IMAGES/HBD06.jpg","IMAGES/HBD07.jpg","IMAGES/HBD09.jpg",
+      "IMAGES/HBD10.jpg","IMAGES/HBD11.jpg","IMAGES/HBD12.jpg","IMAGES/HBD13.jpg",
+      "IMAGES/HBD14.jpg","IMAGES/HBD15.jpg","IMAGES/HBD16.jpg","IMAGES/HBD17.jpg",
+      "IMAGES/HBD18.jpg","IMAGES/HBD19.jpg","IMAGES/HBD20.jpg","IMAGES/HBD21.jpg",
+      "IMAGES/HBD22.jpg","IMAGES/HBD23.jpg","IMAGES/HBD24.jpg","IMAGES/HBD25.jpg",
+      "IMAGES/HBD26.jpg","IMAGES/HBD27.jpg","IMAGES/HBD28.jpg",
+    ],
+    "canificio": [
+      "https://picsum.photos/seed/canificio1/900/1200",
+      "https://picsum.photos/seed/canificio2/900/1200"
+    ],
+    "memoria-collettiva": [
+      "https://picsum.photos/seed/memoria1/900/1200",
+      "https://picsum.photos/seed/memoria2/900/1200"
+    ],
+    "artiglieria": [
+      "https://picsum.photos/seed/artiglieria1/900/1200",
+      "https://picsum.photos/seed/artiglieria2/900/1200"
+    ],
+    "nanako": [
+      "https://picsum.photos/seed/nanako1/900/1200",
+      "https://picsum.photos/seed/nanako2a/900/1200"
+    ],
+    "marcon": [
+      "https://picsum.photos/seed/marcon1/900/1200",
+      "https://picsum.photos/seed/marcon2/900/1200"
+    ],
+    "nanako2": [
+      "https://picsum.photos/seed/nanako2b/900/1200",
+      "https://picsum.photos/seed/nanako2c/900/1200"
+    ]
+  };
+
+  function fillGrid(containerId, images){
+    const container = document.getElementById(containerId);
+    images.forEach(src => {
+      const img = document.createElement('img');
+      img.src = src;
+      container.appendChild(img);
+    });
+  }
+  fillGrid('grid-pubblication', pubblicationImages);
+  fillGrid('grid-collage', collageImages);
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  /* FIX 15: posizione di nuovo davvero casuale (non più a griglia
+     fissa) — ma prima di piazzare una foto lo script controlla che
+     lo spazio non sia già occupato da un'altra foto visibile, e se
+     serve riprova con un'altra posizione casuale, così non si
+     sovrappongono mai. Le due costanti sotto sono la metà larghezza
+     e la metà altezza "di sicurezza" attorno a ogni foto (in %). */
+  const COLLAGE_HALF_W = 12;
+  const COLLAGE_HALF_H = 21;
+
+  function overlaps(x1, y1, x2, y2){
+    return Math.abs(x1 - x2) < COLLAGE_HALF_W * 2 && Math.abs(y1 - y2) < COLLAGE_HALF_H * 2;
+  }
+
+  function findFreePosition(existing){
+    const marginX = COLLAGE_HALF_W + 1;
+    const marginY = COLLAGE_HALF_H + 1;
+    for(let attempt = 0; attempt < 40; attempt++){
+      const x = marginX + Math.random() * (100 - marginX * 2);
+      const y = marginY + Math.random() * (100 - marginY * 2);
+      if(!existing.some(p => overlaps(x, y, p.x, p.y))) return {x, y};
+    }
+    return null; // FIX 15: nessuno spazio libero trovato, si riprova al giro dopo
+  }
+
+  /* ============================================================
+     COLLAGE — home
+     Le foto compaiono una alla volta, a intervalli casuali, in
+     posizioni casuali che non si sovrappongono mai fra loro, e
+     restano visibili accumulandosi. Quando se ne sono accumulate
+     "maxVisible", dopo una breve pausa spariscono tutte insieme e
+     il ciclo ricomincia da capo con un nuovo ordine casuale.
+     >>> Per cambiare quante foto si accumulano prima di svuotare,
+     modifica il numero "maxVisible" qui sotto. <<<
+     ============================================================ */
+  function startHomeCollage(containerId, images, maxVisible = 8){
+    const container = document.getElementById(containerId);
+    if(images.length === 0) return;
+
+    let deck = shuffle(images);
+    let deckIndex = 0;
+    let shown = []; // { img, pos:{x,y} }
+
+    function nextImage(){
+      if(deckIndex >= deck.length){
+        deck = shuffle(images);
+        deckIndex = 0;
+      }
+      return deck[deckIndex++];
+    }
+
+    function placeOne(){
+      const pos = findFreePosition(shown.map(item => item.pos));
+      if(!pos){
+        // FIX 15: nessuno spazio libero adesso, riprova più tardi senza piazzare nulla
+        scheduleNext();
+        return;
+      }
+
+      const src = nextImage();
+      const img = document.createElement('img');
+      img.className = 'collage-photo';
+
+      img.style.left = pos.x + '%';
+      img.style.top = pos.y + '%';
+      img.style.transform = 'translate(-50%, -50%)'; // niente rotazione, foto dritte
+      img.src = src;
+
+      container.appendChild(img);
+      shown.push({ img, pos });
+
+      requestAnimationFrame(() => requestAnimationFrame(() => img.classList.add('visible')));
+
+      if(shown.length >= maxVisible){
+        setTimeout(resetCollage, 2200);
+        return;
+      }
+      scheduleNext();
+    }
+
+    function resetCollage(){
+      shown.forEach(item => item.img.classList.remove('visible'));
+      setTimeout(() => {
+        shown.forEach(item => item.img.remove());
+        shown = [];
+        scheduleNext();
+      }, 800);
+    }
+
+    function scheduleNext(){
+      const delay = 900 + Math.random() * 1400;
+      setTimeout(placeOne, delay);
+    }
+
+    scheduleNext();
+  }
+
+  startHomeCollage('home-collage', homeImages);
+
+
+  const rightColumn      = document.getElementById('right');
+  const framesWrap       = document.getElementById('frames-wrap');
+  const gridPubblication = document.getElementById('grid-pubblication');
+  const gridCollage      = document.getElementById('grid-collage');
+  const listStories      = document.getElementById('list-stories');
+  const listWorks        = document.getElementById('list-works');
+  const bookViewer       = document.getElementById('book-viewer');
+  const mainNav          = document.querySelector('nav.main-nav');
+  const navLinks         = document.querySelectorAll('[data-view]');
+  const projectLinks     = document.querySelectorAll('[data-project]');
+
+  let currentView = 'home';
+
+  function showView(view){
+    currentView = view;
+
+    listStories.hidden = (view !== 'stories');
+    listWorks.hidden   = (view !== 'works');
+
+    // FIX 12: la colonna destra e il menu non spariscono più — restano
+    // sempre visibili, anche quando apri Stories o Works
+    rightColumn.style.display = 'block';
+    framesWrap.style.display  = (view === 'pubblication' || view === 'collage') ? 'none' : 'block';
+    gridPubblication.hidden   = (view !== 'pubblication');
+    gridCollage.hidden        = (view !== 'collage');
+
+    mainNav.style.display = 'flex';
+
+    bookViewer.hidden = true;
+    projectLinks.forEach(a => a.classList.remove('active'));
+
+    navLinks.forEach(a => a.classList.toggle('active', a.dataset.view === view));
+  }
+
+  navLinks.forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      showView(a.dataset.view);
+    });
+  });
+
+  let bookImages = [];
+  let slideIndex = 0;
+
+  function buildBook(key, linkEl){
+    bookImages = projectImages[key] || [];
+    slideIndex = 0;
+    bookViewer.innerHTML = '';
+
+    if(bookImages.length === 0){
+      const empty = document.createElement('p');
+      empty.textContent = 'Nessuna foto trovata per questo progetto.';
+      bookViewer.appendChild(empty);
+      bookViewer.hidden = false;
+      return;
+    }
+
+    const closeBtn = document.createElement('a');
+    closeBtn.href = '#';
+    closeBtn.className = 'book-close';
+    closeBtn.textContent = 'Chiudi ×';
+    closeBtn.addEventListener('click', e => {
+      e.preventDefault();
+      closeBook();
+    });
+
+    const stage = document.createElement('div');
+    stage.className = 'book-stage';
+
+    const track = document.createElement('div');
+    track.className = 'book-track';
+
+    // FIX 11: una slide per ogni foto, non più a coppie
+    bookImages.forEach(src => {
+      const slide = document.createElement('div');
+      slide.className = 'book-slide';
+      const img = document.createElement('img');
+      img.src = src;
+      slide.appendChild(img);
+      track.appendChild(slide);
+    });
+
+    stage.appendChild(track);
+
+    const nav = document.createElement('div');
+    nav.className = 'book-nav';
+
+    const prevBtn = document.createElement('button');
+    prevBtn.type = 'button';
+    prevBtn.textContent = '←';
+
+    const counter = document.createElement('span');
+
+    const nextBtn = document.createElement('button');
+    nextBtn.type = 'button';
+    nextBtn.textContent = '→';
+
+    function render(){
+      track.style.transform = `translateX(-${slideIndex * 100}%)`;
+      counter.textContent = (slideIndex + 1) + ' / ' + bookImages.length;
+    }
+
+    function goNext(){
+      slideIndex = (slideIndex + 1) % bookImages.length;
+      render();
+    }
+    function goPrev(){
+      slideIndex = (slideIndex - 1 + bookImages.length) % bookImages.length;
+      render();
+    }
+
+    stage.addEventListener('click', goNext);
+    prevBtn.addEventListener('click', e => { e.stopPropagation(); goPrev(); });
+    nextBtn.addEventListener('click', e => { e.stopPropagation(); goNext(); });
+
+    nav.appendChild(prevBtn);
+    nav.appendChild(counter);
+    nav.appendChild(nextBtn);
+
+
+    bookViewer.appendChild(closeBtn);
+    bookViewer.appendChild(stage);
+    bookViewer.appendChild(nav);
+    render();
+
+    rightColumn.style.display = 'block';
+    framesWrap.style.display = 'none';
+    gridPubblication.hidden = true;
+    gridCollage.hidden = true;
+    bookViewer.hidden = false;
+
+    projectLinks.forEach(a => a.classList.toggle('active', a === linkEl));
+  }
+
+  function closeBook(){
+    bookViewer.hidden = true;
+    projectLinks.forEach(a => a.classList.remove('active'));
+    // FIX 12: la colonna destra resta sempre visibile, tornano le foto della
+    // home tranne quando si sta guardando Pubblication o Collage
+    rightColumn.style.display = 'block';
+    framesWrap.style.display = (currentView === 'pubblication' || currentView === 'collage') ? 'none' : 'block';
+    gridPubblication.hidden = (currentView !== 'pubblication');
+    gridCollage.hidden = (currentView !== 'collage');
+  }
+
+  projectLinks.forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      buildBook(a.dataset.project, a);
+    });
+  });
+
+  showView('home');
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brigida Brancale</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#F7F6F2;
+    --ink:#14120F;
+    --muted:#8D8A82;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  [hidden]{ display:none !important; }
+
+  html,body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Instrument Sans', sans-serif;
+    height:100%;
+    overflow:hidden;
+  }
+  a{ color:inherit; text-decoration:none; }
+
+  .page{
+    display:flex;
+    height:100vh;
+    width:100vw;
+  }
+
+  .left{
+    width:42%;
+    position:relative;
+    padding:2.4rem 3vw;
+  }
+
+  .right{
+    width:58%;
+    position:relative;
+  }
+
+  .frames-wrap{
+    position:absolute;
+    inset:0;
+  }
+
+  .photo-grid{
+    position:absolute;
+    inset:0;
+    padding:2.4rem 3vw;
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    grid-auto-rows:1fr;
+    gap:0.8rem;
+    overflow-y:auto;
+  }
+  .photo-grid img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+
+  .brand{
+    font-size:0.95rem;
+    font-weight:500;
+    letter-spacing:0.02em;
+  }
+
+  .name-block{
+    display:flex;
+    align-items:flex-start;
+    gap:3.5vw;
+  }
+
+  nav.main-nav{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:0.55rem;
+  }
+  nav.main-nav a{
+    font-size:0.95rem;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    position:relative;
+  }
+  nav.main-nav a::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:-2px;
+    height:1px; background:currentColor;
+    transform:scaleX(0); transform-origin:left;
+    transition:transform .3s ease;
+  }
+  nav.main-nav a:hover::after{ transform:scaleX(1); }
+  nav.main-nav a.active{ color:var(--muted); }
+
   .project-list{
     margin-top:2.6rem;
   }
