@@ -7,7 +7,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DMmono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
 
 <style>
   :root{
@@ -23,7 +23,8 @@
   html,body{
     background:var(--bg);
     color:var(--ink);
-    font-family:'DM Mono', sans-serif;
+    font-family:'DM Mono', monospace;
+    font-weight:300;
     height:100%;
     overflow:hidden;
   }
@@ -69,8 +70,8 @@
   }
 
   .brand{
-    font-size:0.95rem;
-    font-weight:500;
+    font-size:0.78rem; /* FIX 22: font DM Mono, peso Light 300, tutto un po' più piccolo e uniforme */
+    font-weight:300;
     letter-spacing:0.02em;
   }
 
@@ -87,8 +88,8 @@
     gap:0.55rem;
   }
   nav.main-nav a{
-    font-size:0.95rem;
-    text-transform:uppercase;
+    font-size:0.78rem;
+    text-transform:lowercase;
     letter-spacing:0.04em;
     position:relative;
   }
@@ -115,8 +116,8 @@
     gap:0.6rem;
   }
   .project-list a{
-    font-size:0.95rem; /* stessa dimensione delle voci del menu */
-    text-transform:uppercase;
+    font-size:0.78rem; /* stessa dimensione delle voci del menu */
+    text-transform:lowercase;
     letter-spacing:0.04em;
     transition:opacity .25s ease;
   }
@@ -126,8 +127,8 @@
   .about-link{
     position:absolute;
     left:3vw; bottom:2.4rem;
-    font-size:0.95rem;
-    text-transform:uppercase;
+    font-size:0.78rem;
+    text-transform:lowercase;
     letter-spacing:0.04em;
   }
 
@@ -136,7 +137,7 @@
     position:absolute;
     left:3vw; right:6vw;
     bottom:5.2rem;
-    font-size:0.85rem;
+    font-size:0.78rem;
     line-height:1.55;
     color:var(--muted);
   }
@@ -144,7 +145,7 @@
   .email-link{
     position:absolute;
     right:3vw; bottom:2.4rem;
-    font-size:0.85rem;
+    font-size:0.78rem;
     color:var(--muted);
     z-index:10;
   }
@@ -213,8 +214,8 @@
     display:flex;
     align-items:center;
     gap:1.6rem;
-    font-size:0.85rem;
-    text-transform:uppercase;
+    font-size:0.78rem;
+    text-transform:lowercase;
     letter-spacing:0.04em;
     color:var(--muted);
   }
@@ -223,7 +224,7 @@
     border:none;
     cursor:pointer;
     font-family:inherit;
-    font-size:1rem;
+    font-size:0.78rem;
     color:var(--ink);
     padding:0.2rem 0.5rem;
   }
@@ -231,8 +232,8 @@
   .book-close{
     position:absolute;
     top:2.4rem; right:3vw;
-    font-size:0.85rem;
-    text-transform:uppercase;
+    font-size:0.78rem;
+    text-transform:lowercase;
     letter-spacing:0.04em;
   }
   .book-close:hover{ color:var(--muted); }
@@ -638,8 +639,6 @@
     const prevBtn = document.createElement('button');
     prevBtn.type = 'button';
     prevBtn.textContent = '←';
-
-    const counter = document.createElement('span');
 
     const nextBtn = document.createElement('button');
     nextBtn.type = 'button';
