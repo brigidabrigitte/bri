@@ -109,17 +109,17 @@
   .nav-row{
     display:flex;
     align-items:center;
-    flex-wrap:nowrap; /* FIX 16: mai a capo — così non aumenta mai l'altezza della riga e non sposta le voci sotto */
-    gap:1.1rem;
+    flex-wrap:nowrap; /* mai a capo — così non aumenta mai l'altezza della riga e non sposta le voci sotto */
+    gap:0.6rem; /* FIX 19: avvicinata la lista alla voce di menu (era 1.1rem) */
   }
 
   .project-list ul{
     list-style:none;
     display:flex;
     flex-direction:row;
-    flex-wrap:nowrap; /* FIX 16: idem — resta su una sola riga */
+    flex-wrap:nowrap; /* idem — resta su una sola riga */
     white-space:nowrap;
-    gap:1.1rem;
+    gap:1rem;
   }
   .project-list a{
     font-size:0.95rem; /* FIX 15: stessa dimensione delle voci del menu (era 1.4rem) */
@@ -136,6 +136,16 @@
     font-size:0.95rem;
     text-transform:uppercase;
     letter-spacing:0.04em;
+  }
+
+  /* FIX 20: testo di spiegazione del progetto, sopra "About" in basso a sinistra */
+  .project-description{
+    position:absolute;
+    left:3vw; right:6vw;
+    bottom:5.2rem;
+    font-size:0.85rem;
+    line-height:1.55;
+    color:var(--muted);
   }
 
   .email-link{
@@ -282,6 +292,10 @@
       </nav>
     </div>
 
+    <!-- FIX 20: testo di spiegazione del progetto aperto — compare solo
+         quando apri una storia/lavoro specifico (es. SIWA) -->
+    <div class="project-description" id="project-description" hidden></div>
+
     <a class="about-link" href="about.html">About</a>
   </div>
 
@@ -421,13 +435,10 @@
     return a;
   }
 
-  /* FIX 17: le posizioni restano completamente casuali; il controllo
-     anti-sovrapposizione ora lavora in pixel reali (non più in %), e
-     ogni foto riceve una dimensione casuale (mai sotto i 300px), così
-     quando lo spazio grande si esaurisce, le foto più piccole
-     riescono comunque a incastrarsi negli spazi rimasti. */
+  /* FIX 18: tolto il minimo di 300px — dimensioni casuali più piccole,
+     così le foto non risultano troppo grandi sullo schermo. */
   function randomCollageSize(){
-    const w = 300 + Math.random() * 220;              // 300–520px di larghezza massima
+    const w = 140 + Math.random() * 200;               // 140–340px di larghezza massima
     const h = w * (1.1 + Math.random() * 0.5);         // altezza massima proporzionata, con un po' di variazione
     return { w, h };
   }
@@ -534,14 +545,32 @@
   const listStories      = document.getElementById('list-stories');
   const listWorks        = document.getElementById('list-works');
   const bookViewer       = document.getElementById('book-viewer');
+  const projectDescription = document.getElementById('project-description');
   const mainNav          = document.querySelector('nav.main-nav');
   const navLinks         = document.querySelectorAll('[data-view]');
   const projectLinks     = document.querySelectorAll('[data-project]');
+
+  // FIX 20: testo di spiegazione per ogni progetto — le chiavi devono
+  // coincidere con quelle di "projectImages" qui sopra.
+  // >>> QUI VA IL TESTO VERO PER OGNI PROGETTO <<<
+  const projectDescriptions = {
+    "siwa": "Testo di presentazione del progetto SIWA — sostituisci con il tuo testo.",
+    "cellulari": "Testo di presentazione del progetto Cellulari — sostituisci con il tuo testo.",
+    "abitare": "Testo di presentazione del progetto Abitare — sostituisci con il tuo testo.",
+    "here-be-dragons": "Testo di presentazione del progetto Here Be Dragons — sostituisci con il tuo testo.",
+    "canificio": "Testo di presentazione del progetto Canificio — sostituisci con il tuo testo.",
+    "memoria-collettiva": "Testo di presentazione del progetto Memoria Collettiva — sostituisci con il tuo testo.",
+    "artiglieria": "Testo di presentazione del progetto Artiglieria — sostituisci con il tuo testo.",
+    "nanako": "Testo di presentazione del progetto Nanako — sostituisci con il tuo testo.",
+    "marcon": "Testo di presentazione del progetto Marcon — sostituisci con il tuo testo.",
+    "nanako2": "Testo di presentazione del progetto Nanako2 — sostituisci con il tuo testo."
+  };
 
   let currentView = 'home';
 
   function showView(view){
     currentView = view;
+    projectDescription.hidden = true; // il testo si nasconde ogni volta che cambi vista dal menu
 
     listStories.hidden = (view !== 'stories');
     listWorks.hidden   = (view !== 'works');
@@ -658,11 +687,16 @@
     gridCollage.hidden = true;
     bookViewer.hidden = false;
 
+    // FIX 20: mostra il testo di spiegazione del progetto appena aperto
+    projectDescription.textContent = projectDescriptions[key] || '';
+    projectDescription.hidden = !projectDescriptions[key];
+
     projectLinks.forEach(a => a.classList.toggle('active', a === linkEl));
   }
 
   function closeBook(){
     bookViewer.hidden = true;
+    projectDescription.hidden = true; // FIX 20: il testo sparisce insieme al progetto
     projectLinks.forEach(a => a.classList.remove('active'));
     // FIX 12: la colonna destra resta sempre visibile, tornano le foto della
     // home tranne quando si sta guardando Pubblication o Collage
