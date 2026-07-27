@@ -27,6 +27,665 @@
     font-weight:300;
     height:100%;
     overflow:hidden;
+    text-transform:lowercase;
+  }
+  a{ color:inherit; text-decoration:none; }
+
+  .page{
+    display:flex;
+    height:100vh;
+    width:100vw;
+  }
+
+  .left{
+    width:42%;
+    position:relative;
+    padding:2.4rem 3vw;
+  }
+
+  .right{
+    width:58%;
+    position:relative;
+  }
+
+  .frames-wrap{
+    position:absolute;
+    inset:0;
+  }
+
+  .photo-grid{
+    position:absolute;
+    inset:0;
+    padding:2.4rem 3vw;
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    grid-auto-rows:1fr;
+    gap:0.8rem;
+    overflow-y:auto;
+  }
+  .photo-grid img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+
+  .brand{
+    font-size:0.78rem;
+    font-weight:300;
+    letter-spacing:0.02em;
+  }
+  .brand:hover, .brand.active{ color:var(--ink); }
+
+  .name-block{
+    display:flex;
+    align-items:flex-start;
+    gap:3.5vw;
+  }
+
+  nav.main-nav{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:0.55rem;
+  }
+  nav.main-nav a{
+    font-size:0.78rem;
+    letter-spacing:0.04em;
+    position:relative;
+  }
+  nav.main-nav a:hover{ color:var(--ink); }
+  nav.main-nav a.active{ color:var(--ink); }
+
+  .left{
+    z-index:2;
+  }
+
+  .project-list ul{
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap:0.6rem;
+  }
+  .project-list a{
+    font-size:0.78rem;
+    letter-spacing:0.04em;
+    transition:color .25s ease;
+  }
+  .project-list a:hover{ color:var(--ink); }
+  .project-list a.active{ color:var(--ink); }
+
+  .about-link{
+    position:absolute;
+    left:3vw; bottom:2.4rem;
+    font-size:0.78rem;
+    letter-spacing:0.04em;
+  }
+  .about-link:hover{ color:var(--ink); }
+
+  .project-description{
+    position:absolute;
+    left:3vw; right:6vw;
+    bottom:5.2rem;
+    font-size:0.78rem;
+    line-height:1.55;
+    color:var(--muted);
+  }
+
+  .email-link{
+    position:absolute;
+    right:3vw; bottom:2.4rem;
+    font-size:0.78rem;
+    color:var(--muted);
+    z-index:10;
+  }
+  .email-link:hover{ color:var(--ink); }
+
+  /* FIX 25: niente più collage — un'unica foto alla volta, ferma nello
+     stesso punto, proporzioni naturali. Il filtro SVG "liquid-filter"
+     (definito nell'HTML) crea l'effetto di distorsione liquida quando
+     ci passi sopra col mouse (vedi JS più sotto). */
+  .home-slide{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .home-slide img{
+    display:block;
+    width:auto;
+    height:auto;
+    max-width:76%;
+    max-height:80%;
+    opacity:1;
+    transition:opacity 0.6s ease;
+    filter:url(#liquid-filter);
+    cursor:pointer;
+  }
+
+  .book{
+    position:absolute;
+    inset:0;
+    padding:2.4rem 3vw;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:1.2rem;
+  }
+  .book-stage{
+    position:relative;
+    width:100%;
+    max-width:74vw;
+    height:74%;
+    overflow:hidden;
+    cursor:pointer;
+  }
+  .book-track{
+    display:flex;
+    height:100%;
+    transition:transform 0.6s cubic-bezier(.65,0,.35,1);
+  }
+  .book-slide{
+    flex:0 0 100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:100%;
+  }
+  .book-slide img{
+    display:block;
+    max-width:100%;
+    max-height:100%;
+    width:auto;
+    height:auto;
+  }
+  .book-nav{
+    display:flex;
+    align-items:center;
+    gap:1.6rem;
+    font-size:0.78rem;
+    letter-spacing:0.04em;
+    color:var(--muted);
+  }
+  .book-nav button{
+    background:none;
+    border:none;
+    cursor:pointer;
+    font-family:inherit;
+    font-size:0.78rem;
+    color:var(--muted);
+    padding:0.2rem 0.5rem;
+  }
+  .book-nav button:hover{ color:var(--ink); }
+  .book-close{
+    position:absolute;
+    top:2.4rem; right:3vw;
+    font-size:0.78rem;
+    letter-spacing:0.04em;
+  }
+  .book-close:hover{ color:var(--ink); }
+
+  @media(max-width:900px){
+    html,body{ overflow:auto; }
+    .page{ flex-direction:column; height:auto; }
+    .left, .right{ width:100%; }
+    .right{ height:80vh; margin-top:2rem; }
+    .about-link, .email-link{ position:static; margin-top:2rem; display:block; }
+  }
+</style>
+</head>
+<body>
+
+<!-- FIX 25: filtro SVG per l'effetto di distorsione liquida al passaggio
+     del mouse — feTurbulence genera il "rumore", feDisplacementMap lo
+     usa per deformare l'immagine. La forza (scale) viene animata via JS. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="liquid-filter" x="-20%" y="-20%" width="140%" height="140%">
+    <feTurbulence id="liquid-turb" type="fractalNoise" baseFrequency="0.008 0.014" numOctaves="2" seed="7" result="turbulence"/>
+    <feDisplacementMap id="liquid-disp" in="SourceGraphic" in2="turbulence" scale="0" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<div class="page">
+
+  <div class="left">
+
+    <div class="name-block">
+      <a class="brand" href="index.html" data-view="home">Brigida Brancale</a>
+
+      <nav class="main-nav">
+        <a href="stories.html" data-view="stories">Stories</a>
+        <a href="work.html" data-view="works">Works</a>
+        <a href="publications.html" data-view="pubblication">Pubblication</a>
+        <a href="collage.html" data-view="collage">Collage</a>
+      </nav>
+
+      <div class="project-list" id="list-stories" hidden>
+        <ul>
+          <li><a href="stories.html#siwa" data-project="siwa">you'll never know the age of a palm</a></li>
+          <li><a href="stories.html#cellulari" data-project="cellulari">moment du faux</a></li>
+          <li><a href="stories.html#abitare" data-project="abitare">daily practice</a></li>
+          <li><a href="stories.html#here-be-dragons" data-project="here-be-dragons">here be dragons</a></li>
+        </ul>
+      </div>
+      <div class="project-list" id="list-works" hidden>
+        <ul>
+          <li><a href="work.html#canificio" data-project="canificio">Canificio</a></li>
+          <li><a href="work.html#memoria-collettiva" data-project="memoria-collettiva">Memoria Collettiva</a></li>
+          <li><a href="work.html#artiglieria" data-project="artiglieria">Artiglieria</a></li>
+          <li><a href="work.html#nanako" data-project="nanako">Nanako</a></li>
+          <li><a href="work.html#marcon" data-project="marcon">Marcon</a></li>
+          <li><a href="work.html#nanako2" data-project="nanako2">Nanako2</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="project-description" id="project-description" hidden></div>
+
+    <a class="about-link" href="about.html">About</a>
+  </div>
+
+  <div class="right" id="right">
+    <div class="frames-wrap" id="frames-wrap">
+      <div class="home-slide" id="home-slide">
+        <img id="home-slide-img" alt="">
+      </div>
+    </div>
+
+    <div class="photo-grid" id="grid-pubblication" hidden></div>
+    <div class="photo-grid" id="grid-collage" hidden></div>
+
+    <div class="book" id="book-viewer" hidden></div>
+  </div>
+
+  <a class="email-link" href="mailto:mail@brigidabrancale.com">mail@brigidabrancale.com</a>
+
+</div>
+
+<script>
+  const homeImages = [
+    "IMAGES/HBD01.jpg",
+    "IMAGES/HBD02.jpg",
+    "IMAGES/HBD03.jpg",
+    "IMAGES/HBD04.jpg",
+    "IMAGES/HBD05.jpg",
+    "IMAGES/HBD06.jpg",
+    "IMAGES/HBD07.jpg",
+    "IMAGES/HBD08.jpg",
+    "IMAGES/PHONES - 001.jpg",
+    "IMAGES/PHONES - 002.jpg",
+    "IMAGES/PHONES - 003.jpg",
+    "IMAGES/PHONES - 004.jpg",
+    "IMAGES/PHONES - 005.jpg",
+    "IMAGES/PHONES - 006.jpg",
+    "IMAGES/PHONES - 007.jpg",
+    "IMAGES/PHONES - 008.jpg",
+    "IMAGES/SIWA01.jpg",
+    "IMAGES/SIWA02.jpg",
+    "IMAGES/SIWA03.jpg",
+    "IMAGES/SIWA04.jpg",
+    "IMAGES/SIWA05.jpg",
+    "IMAGES/SIWA06.jpg",
+    "IMAGES/SIWA07.jpg",
+    "IMAGES/SIWA08.jpg"
+  ];
+
+  const pubblicationImages = [
+    "https://picsum.photos/id/1011/500/500",
+    "https://picsum.photos/id/1025/500/500",
+    "https://picsum.photos/id/1035/500/500",
+    "https://picsum.photos/id/1050/500/500",
+    "https://picsum.photos/id/1059/500/500",
+    "https://picsum.photos/id/1060/500/500"
+  ];
+  const collageImages = [
+    "https://picsum.photos/id/1027/500/500",
+    "https://picsum.photos/id/1031/500/500",
+    "https://picsum.photos/id/1033/500/500",
+    "https://picsum.photos/id/1044/500/500",
+    "https://picsum.photos/id/1053/500/500",
+    "https://picsum.photos/id/1057/500/500"
+  ];
+
+  const projectImages = {
+    "siwa": [
+      "IMAGES/SIWA01.jpg","IMAGES/SIWA02.jpg","IMAGES/SIWA03.jpg","IMAGES/SIWA04.jpg",
+      "IMAGES/SIWA05.jpg","IMAGES/SIWA06.jpg","IMAGES/SIWA07.jpg","IMAGES/SIWA08.jpg",
+      "IMAGES/SIWA09.jpg","IMAGES/SIWA10.jpg","IMAGES/SIWA11.jpg","IMAGES/SIWA12.jpg",
+      "IMAGES/SIWA13.jpg","IMAGES/SIWA14.jpg","IMAGES/SIWA15.jpg","IMAGES/SIWA16.jpg",
+      "IMAGES/SIWA17.jpg","IMAGES/SIWA18.jpg","IMAGES/SIWA19.jpg","IMAGES/SIWA20.jpg"
+    ],
+    "cellulari": [
+      "IMAGES/PHONES - 001.jpg","IMAGES/PHONES - 002.jpg","IMAGES/PHONES - 003.jpg","IMAGES/PHONES - 004.jpg",
+      "IMAGES/PHONES - 005.jpg","IMAGES/PHONES - 006.jpg","IMAGES/PHONES - 007.jpg","IMAGES/PHONES - 008.jpg",
+      "IMAGES/PHONES - 009.jpg","IMAGES/PHONES - 0010.jpg","IMAGES/PHONES - 0011.jpg","IMAGES/PHONES - 0012.jpg",
+      "IMAGES/PHONES - 0013.jpg","IMAGES/PHONES - 0014.jpg","IMAGES/PHONES - 0015.jpg","IMAGES/PHONES - 0016.jpg",
+      "IMAGES/PHONES - 0017.jpg","IMAGES/PHONES - 0018.jpg","IMAGES/PHONES - 0019.jpg","IMAGES/PHONES - 0020.jpg",
+      "IMAGES/PHONES - 0021.jpg","IMAGES/PHONES - 0022.jpg","IMAGES/PHONES - 0023.jpg","IMAGES/PHONES - 0024.jpg",
+      "IMAGES/PHONES - 0025.jpg","IMAGES/PHONES - 0026.jpg"
+    ],
+    "abitare": [
+      "https://picsum.photos/seed/abitare1/900/1200",
+      "https://picsum.photos/seed/abitare2/900/1200"
+    ],
+    "here-be-dragons": [
+      "IMAGES/HBD01.jpg","IMAGES/HBD02.jpg","IMAGES/HBD03.jpg","IMAGES/HBD04.jpg",
+      "IMAGES/HBD05.jpg","IMAGES/HBD06.jpg","IMAGES/HBD07.jpg","IMAGES/HBD09.jpg",
+      "IMAGES/HBD10.jpg","IMAGES/HBD11.jpg","IMAGES/HBD12.jpg","IMAGES/HBD13.jpg",
+      "IMAGES/HBD14.jpg","IMAGES/HBD15.jpg","IMAGES/HBD16.jpg","IMAGES/HBD17.jpg",
+      "IMAGES/HBD18.jpg","IMAGES/HBD19.jpg","IMAGES/HBD20.jpg","IMAGES/HBD21.jpg",
+      "IMAGES/HBD22.jpg","IMAGES/HBD23.jpg","IMAGES/HBD24.jpg","IMAGES/HBD25.jpg",
+      "IMAGES/HBD26.jpg","IMAGES/HBD27.jpg","IMAGES/HBD28.jpg"
+    ],
+    "canificio": [
+      "https://picsum.photos/seed/canificio1/900/1200",
+      "https://picsum.photos/seed/canificio2/900/1200"
+    ],
+    "memoria-collettiva": [
+      "https://picsum.photos/seed/memoria1/900/1200",
+      "https://picsum.photos/seed/memoria2/900/1200"
+    ],
+    "artiglieria": [
+      "https://picsum.photos/seed/artiglieria1/900/1200",
+      "https://picsum.photos/seed/artiglieria2/900/1200"
+    ],
+    "nanako": [
+      "https://picsum.photos/seed/nanako1/900/1200",
+      "https://picsum.photos/seed/nanako2a/900/1200"
+    ],
+    "marcon": [
+      "https://picsum.photos/seed/marcon1/900/1200",
+      "https://picsum.photos/seed/marcon2/900/1200"
+    ],
+    "nanako2": [
+      "https://picsum.photos/seed/nanako2b/900/1200",
+      "https://picsum.photos/seed/nanako2c/900/1200"
+    ]
+  };
+
+  function fillGrid(containerId, images){
+    const container = document.getElementById(containerId);
+    images.forEach(src => {
+      const img = document.createElement('img');
+      img.src = src;
+      container.appendChild(img);
+    });
+  }
+  fillGrid('grid-pubblication', pubblicationImages);
+  fillGrid('grid-collage', collageImages);
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  /* ============================================================
+     SLIDESHOW HOME — una foto alla volta, ferma sempre nello stesso
+     punto, proporzioni naturali. Cambia foto da sola ogni tot secondi
+     con una breve dissolvenza.
+     >>> Per cambiare quanto resta ferma ogni foto, modifica
+     "intervalMs" qui sotto (in millisecondi). <<<
+     ============================================================ */
+  function startHomeSlideshow(imgEl, images, intervalMs = 4500){
+    if(images.length === 0) return;
+    let deck = shuffle(images);
+    let index = 0;
+
+    function show(i){
+      imgEl.style.opacity = 0;
+      setTimeout(() => {
+        imgEl.src = deck[i];
+        imgEl.style.opacity = 1;
+      }, 500);
+    }
+
+    show(index);
+    if(deck.length < 2) return;
+
+    setInterval(() => {
+      index = (index + 1) % deck.length;
+      if(index === 0) deck = shuffle(images);
+      show(index);
+    }, intervalMs);
+  }
+
+  const homeSlideImg = document.getElementById('home-slide-img');
+  startHomeSlideshow(homeSlideImg, homeImages);
+
+  /* ============================================================
+     EFFETTO LIQUIDO AL HOVER — anima la forza del filtro SVG
+     "liquid-filter" (definito nell'HTML): sale dolcemente quando il
+     mouse entra nella foto, scende quando esce, e mentre è attivo la
+     "turbolenza" ondeggia leggermente per dare l'effetto liquido.
+     >>> Per rendere l'effetto più o meno marcato, cambia il numero
+     "maxScale" qui sotto (più alto = distorsione più forte). <<<
+     ============================================================ */
+  (function setupLiquidHover(){
+    const turb = document.getElementById('liquid-turb');
+    const disp = document.getElementById('liquid-disp');
+    if(!turb || !disp) return;
+
+    const maxScale = 45;
+    let targetScale = 0;
+    let currentScale = 0;
+
+    homeSlideImg.addEventListener('mouseenter', () => { targetScale = maxScale; });
+    homeSlideImg.addEventListener('mouseleave', () => { targetScale = 0; });
+
+    function tick(t){
+      currentScale += (targetScale - currentScale) * 0.12;
+      disp.setAttribute('scale', currentScale.toFixed(1));
+
+      if(currentScale > 0.5){
+        const bf = 0.008 + Math.sin(t / 700) * 0.003;
+        turb.setAttribute('baseFrequency', bf.toFixed(4) + ' ' + (bf * 1.7).toFixed(4));
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  })();
+
+
+  const framesWrap       = document.getElementById('frames-wrap');
+  const gridPubblication = document.getElementById('grid-pubblication');
+  const gridCollage      = document.getElementById('grid-collage');
+  const listStories      = document.getElementById('list-stories');
+  const listWorks        = document.getElementById('list-works');
+  const bookViewer       = document.getElementById('book-viewer');
+  const projectDescription = document.getElementById('project-description');
+  const navLinks         = document.querySelectorAll('[data-view]');
+  const projectLinks     = document.querySelectorAll('[data-project]');
+
+  const projectDescriptions = {
+    "siwa": "When a palm tree is born, it must be protected and cared for during its first years of life. In Siwa, this knowledge has been passed down orally for generations, reflecting a deep relationship between the community, water, and the land. Isolated in Egypt's Western Desert, the oasis has preserved its Amazigh identity and has long been associated with the Oracle of Amun, a place once consulted about the future. Today, Siwa itself seems to carry a warning. Agricultural expansion, the overexploitation of the fossil aquifer, and increasing salinity are transforming its fragile ecosystem, while tourism and globalisation are accelerating the loss of local identity. Through the concept of place displacement, this project documents a community whose environment is changing beneath its feet. Rather than preserving a disappearing past, the photographs explore how local knowledge can become a bridge between memory and future in the face of the climate crisis.",
+    "cellulari": "moment du faux",
+    "abitare": "Testo di presentazione del progetto Abitare — sostituisci con il tuo testo.",
+    "here-be-dragons": "Testo di presentazione del progetto Here Be Dragons — sostituisci con il tuo testo.",
+    "canificio": "Testo di presentazione del progetto Canificio — sostituisci con il tuo testo.",
+    "memoria-collettiva": "Testo di presentazione del progetto Memoria Collettiva — sostituisci con il tuo testo.",
+    "artiglieria": "Testo di presentazione del progetto Artiglieria — sostituisci con il tuo testo.",
+    "nanako": "Testo di presentazione del progetto Nanako — sostituisci con il tuo testo.",
+    "marcon": "Testo di presentazione del progetto Marcon — sostituisci con il tuo testo.",
+    "nanako2": "Testo di presentazione del progetto Nanako2 — sostituisci con il tuo testo."
+  };
+
+  let currentView = 'home';
+
+  function applyRightPanel(view){
+    framesWrap.style.display = (view === 'pubblication' || view === 'collage') ? 'none' : 'block';
+    gridPubblication.hidden  = (view !== 'pubblication');
+    gridCollage.hidden       = (view !== 'collage');
+  }
+
+  function showView(view){
+    currentView = view;
+    projectDescription.hidden = true;
+
+    listStories.hidden = (view !== 'stories');
+    listWorks.hidden   = (view !== 'works');
+
+    applyRightPanel(view);
+
+    bookViewer.hidden = true;
+    projectLinks.forEach(a => a.classList.remove('active'));
+
+    navLinks.forEach(a => a.classList.toggle('active', a.dataset.view === view));
+  }
+
+  navLinks.forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      showView(a.dataset.view);
+    });
+  });
+
+  let bookImages = [];
+  let slideIndex = 0;
+
+  function buildBook(key, linkEl){
+    bookImages = projectImages[key] || [];
+    slideIndex = 0;
+    bookViewer.innerHTML = '';
+
+    if(bookImages.length === 0){
+      const empty = document.createElement('p');
+      empty.textContent = 'Nessuna foto trovata per questo progetto.';
+      bookViewer.appendChild(empty);
+      bookViewer.hidden = false;
+      return;
+    }
+
+    const closeBtn = document.createElement('a');
+    closeBtn.href = '#';
+    closeBtn.className = 'book-close';
+    closeBtn.textContent = 'Chiudi ×';
+    closeBtn.addEventListener('click', e => {
+      e.preventDefault();
+      closeBook();
+    });
+
+    const stage = document.createElement('div');
+    stage.className = 'book-stage';
+
+    const track = document.createElement('div');
+    track.className = 'book-track';
+
+    bookImages.forEach(src => {
+      const slide = document.createElement('div');
+      slide.className = 'book-slide';
+      const img = document.createElement('img');
+      img.src = src;
+      slide.appendChild(img);
+      track.appendChild(slide);
+    });
+
+    stage.appendChild(track);
+
+    const nav = document.createElement('div');
+    nav.className = 'book-nav';
+
+    const prevBtn = document.createElement('button');
+    prevBtn.type = 'button';
+    prevBtn.textContent = '←';
+
+    const nextBtn = document.createElement('button');
+    nextBtn.type = 'button';
+    nextBtn.textContent = '→';
+
+    function render(){
+      track.style.transform = `translateX(-${slideIndex * 100}%)`;
+    }
+
+    function goNext(){
+      slideIndex = (slideIndex + 1) % bookImages.length;
+      render();
+    }
+    function goPrev(){
+      slideIndex = (slideIndex - 1 + bookImages.length) % bookImages.length;
+      render();
+    }
+
+    stage.addEventListener('click', e => {
+      const rect = stage.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      if(clickX < rect.width / 2) goPrev();
+      else goNext();
+    });
+    prevBtn.addEventListener('click', e => { e.stopPropagation(); goPrev(); });
+    nextBtn.addEventListener('click', e => { e.stopPropagation(); goNext(); });
+
+    nav.appendChild(prevBtn);
+    nav.appendChild(nextBtn);
+
+    bookViewer.appendChild(closeBtn);
+    bookViewer.appendChild(stage);
+    bookViewer.appendChild(nav);
+    render();
+
+    framesWrap.style.display = 'none';
+    gridPubblication.hidden = true;
+    gridCollage.hidden = true;
+    bookViewer.hidden = false;
+
+    projectDescription.textContent = projectDescriptions[key] || '';
+    projectDescription.hidden = !projectDescriptions[key];
+
+    projectLinks.forEach(a => a.classList.toggle('active', a === linkEl));
+  }
+
+  function closeBook(){
+    bookViewer.hidden = true;
+    projectDescription.hidden = true;
+    projectLinks.forEach(a => a.classList.remove('active'));
+    applyRightPanel(currentView);
+  }
+
+  projectLinks.forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      buildBook(a.dataset.project, a);
+    });
+  });
+
+  showView('home');
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>brigida brancale</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --ink:#14120F;
+    --muted:#8D8A82;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  [hidden]{ display:none !important; }
+
+  html,body{
+    background:var(--bg);
+    color:var(--muted);
+    font-family:'DM Mono', monospace;
+    font-weight:300;
+    height:100%;
+    overflow:hidden;
     text-transform:lowercase; /* tutte le scritte del sito, sempre minuscole */
   }
   a{ color:inherit; text-decoration:none; }
