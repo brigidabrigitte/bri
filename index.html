@@ -27,6 +27,7 @@
     font-weight:300;
     height:100%;
     overflow:hidden;
+    text-transform:lowercase; /* tutte le scritte del sito, sempre minuscole */
   }
   a{ color:inherit; text-decoration:none; }
 
@@ -89,18 +90,9 @@
   }
   nav.main-nav a{
     font-size:0.78rem;
-    text-transform:lowercase;
     letter-spacing:0.04em;
     position:relative;
   }
-  nav.main-nav a::after{
-    content:"";
-    position:absolute; left:0; right:0; bottom:-2px;
-    height:1px; background:currentColor;
-    transform:scaleX(0); transform-origin:left;
-    transition:transform .3s ease;
-  }
-  nav.main-nav a:hover::after{ transform:scaleX(1); }
   nav.main-nav a.active{ color:var(--muted); }
 
   .left{
@@ -115,7 +107,6 @@
   }
   .project-list a{
     font-size:0.78rem;
-    text-transform:lowercase;
     letter-spacing:0.04em;
     transition:opacity .25s ease;
   }
@@ -126,7 +117,6 @@
     position:absolute;
     left:3vw; bottom:2.4rem;
     font-size:0.78rem;
-    text-transform:lowercase;
     letter-spacing:0.04em;
   }
 
@@ -203,7 +193,6 @@
     align-items:center;
     gap:1.6rem;
     font-size:0.78rem;
-    text-transform:lowercase;
     letter-spacing:0.04em;
     color:var(--muted);
   }
@@ -221,7 +210,6 @@
     position:absolute;
     top:2.4rem; right:3vw;
     font-size:0.78rem;
-    text-transform:lowercase;
     letter-spacing:0.04em;
   }
   .book-close:hover{ color:var(--muted); }
@@ -528,9 +516,6 @@
 
   let currentView = 'home';
 
-  // Mostra le cornici/griglia giuste per la sezione data, senza toccare
-  // il libro di foto (usata sia da showView sia da closeBook, che prima
-  // ripetevano le stesse tre righe).
   function applyRightPanel(view){
     framesWrap.style.display = (view === 'pubblication' || view === 'collage') ? 'none' : 'block';
     gridPubblication.hidden  = (view !== 'pubblication');
@@ -590,7 +575,6 @@
     const track = document.createElement('div');
     track.className = 'book-track';
 
-    // una slide per ogni foto
     bookImages.forEach(src => {
       const slide = document.createElement('div');
       slide.className = 'book-slide';
@@ -607,17 +591,12 @@
 
     const prevBtn = document.createElement('button');
     prevBtn.type = 'button';
-    prevBtn.textContent = '';
+    prevBtn.textContent = '←';
 
     const nextBtn = document.createElement('button');
     nextBtn.type = 'button';
-    nextBtn.textContent = '';
+    nextBtn.textContent = '→';
 
-    // BUG RISOLTO: prima qui dentro c'era "counter.textContent = ..."
-    // ma "counter" non era mai stato creato da nessuna parte — questo
-    // mandava in errore tutta la funzione buildBook e faceva sì che il
-    // libro non si aprisse mai. Il counter è stato tolto del tutto,
-    // come richiesto, quindi render() ora si occupa solo di scorrere.
     function render(){
       track.style.transform = `translateX(-${slideIndex * 100}%)`;
     }
@@ -631,8 +610,6 @@
       render();
     }
 
-    // clic sulla metà sinistra della foto = pagina precedente,
-    // clic sulla metà destra = pagina successiva
     stage.addEventListener('click', e => {
       const rect = stage.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
