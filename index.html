@@ -22,7 +22,7 @@
 
   html,body{
     background:var(--bg);
-    color:var(--ink);
+    color:var(--muted);
     font-family:'DM Mono', monospace;
     font-weight:300;
     height:100%;
@@ -75,6 +75,7 @@
     font-weight:300;
     letter-spacing:0.02em;
   }
+  .brand:hover, .brand.active{ color:var(--ink); }
 
   .name-block{
     display:flex;
@@ -93,7 +94,8 @@
     letter-spacing:0.04em;
     position:relative;
   }
-  nav.main-nav a.active{ color:var(--muted); }
+  nav.main-nav a:hover{ color:var(--ink); }
+  nav.main-nav a.active{ color:var(--ink); }
 
   .left{
     z-index:2; /* il menu e le sue liste restano sempre sopra le foto */
@@ -108,10 +110,10 @@
   .project-list a{
     font-size:0.78rem;
     letter-spacing:0.04em;
-    transition:opacity .25s ease;
+    transition:color .25s ease;
   }
-  .project-list a:hover{ opacity:0.55; }
-  .project-list a.active{ opacity:0.55; }
+  .project-list a:hover{ color:var(--ink); }
+  .project-list a.active{ color:var(--ink); }
 
   .about-link{
     position:absolute;
@@ -119,6 +121,7 @@
     font-size:0.78rem;
     letter-spacing:0.04em;
   }
+  .about-link:hover{ color:var(--ink); }
 
   .project-description{
     position:absolute;
@@ -202,17 +205,17 @@
     cursor:pointer;
     font-family:inherit;
     font-size:0.78rem;
-    color:var(--ink);
+    color:var(--muted);
     padding:0.2rem 0.5rem;
   }
-  .book-nav button:hover{ color:var(--muted); }
+  .book-nav button:hover{ color:var(--ink); }
   .book-close{
     position:absolute;
     top:2.4rem; right:3vw;
     font-size:0.78rem;
     letter-spacing:0.04em;
   }
-  .book-close:hover{ color:var(--muted); }
+  .book-close:hover{ color:var(--ink); }
 
   @media(max-width:900px){
     html,body{ overflow:auto; }
@@ -241,10 +244,10 @@
 
       <div class="project-list" id="list-stories" hidden>
         <ul>
-          <li><a href="stories.html#siwa" data-project="siwa">SIWA</a></li>
-          <li><a href="stories.html#cellulari" data-project="cellulari">Cellulari</a></li>
-          <li><a href="stories.html#abitare" data-project="abitare">Abitare</a></li>
-          <li><a href="stories.html#here-be-dragons" data-project="here-be-dragons">Here Be Dragons</a></li>
+          <li><a href="stories.html#siwa" data-project="siwa">you'll never know the age of a palm</a></li>
+          <li><a href="stories.html#cellulari" data-project="cellulari">moment du faux</a></li>
+          <li><a href="stories.html#abitare" data-project="abitare">daily practice</a></li>
+          <li><a href="stories.html#here-be-dragons" data-project="here-be-dragons">here be dragons</a></li>
         </ul>
       </div>
       <div class="project-list" id="list-works" hidden>
